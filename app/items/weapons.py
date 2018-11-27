@@ -90,7 +90,7 @@ class RangedWeapon(Item, Weapon):
         Weapon.__init__(self, damage, armor_pen, accuracy, ap_cost, st_requirement)
         self._ammo_type = ammo_type
         self._clip_size = clip_size
-        self._current_ammo = clip_size
+        self._current_ammo = 0
 
     def __str__(self):
         dmg_range = self.get_dmg_range()

@@ -2,6 +2,7 @@ import unittest
 
 from app.items.generic import Item, Armor, Weapon
 from app.items.weapons import MeleeWeapon, RangedWeapon
+from app.items.stackables import Stackable, Ammo, Consumable
 
 
 class ItemTests(unittest.TestCase):
@@ -118,7 +119,7 @@ class RangedWeaponTests(unittest.TestCase):
         self.assertEqual(0, self.weapon.accuracy)
         self.assertEqual("9mm", self.weapon.ammo_type)
         self.assertEqual(10, self.weapon.clip_size)
-        self.assertEqual(10, self.weapon.current_ammo)
+        self.assertEqual(0, self.weapon.current_ammo)
         self.assertEqual(10, self.weapon.ap_cost)
         self.assertEqual(1, self.weapon.st_requirement)
         self.assertEqual(5, self.weapon.value)
@@ -154,9 +155,87 @@ class RangedWeaponTests(unittest.TestCase):
 
     def test_obj_as_str_representation(self):
         correct_str_print = "ID: gun, tags: weapon, gun, short, name: Gun, description: Default gun., " \
-                            "damage: 0 + d4 (1 - 4), penetration: 0, accuracy: 0, ammo: 9mm (10 / 10), AP: 10, " \
+                            "damage: 0 + d4 (1 - 4), penetration: 0, accuracy: 0, ammo: 9mm (0 / 10), AP: 10, " \
                             "strength required: 1, value: 5, weight: 1.0"
         self.assertEqual(correct_str_print, self.weapon.__str__())
+
+
+class StackableTests(unittest.TestCase):
+
+    def test_create_stackable_instance_raises_exception(self):
+        with self.assertRaisesRegex(TypeError, "Can't instantiate abstract class .* with abstract methods .*"):
+            Stackable(max_stack=10, current_amount=5)
+
+
+class AmmoTests(unittest.TestCase):
+
+    def setUp(self):
+        self.ammo = Ammo(item_id="ammo", tags="stackable, ammo, default", name="Ammo", desc="Default ammo.",
+                         max_stack=50, current_amount=30, value=1, weight=0.01)
+
+    def test_property_values(self):
+        self.assertEqual("ammo", self.ammo.item_id)
+        self.assertEqual("stackable, ammo, default", self.ammo.tags)
+        self.assertEqual("Ammo", self.ammo.name)
+        self.assertEqual("Default ammo.", self.ammo.desc)
+        self.assertEqual(50, self.ammo.max_stack)
+        self.assertEqual(30, self.ammo.current_amount)
+        self.assertEqual(1, self.ammo.value)
+        self.assertEqual(0.01, self.ammo.weight)
+
+    def test_set_current_amount(self):
+        self.ammo.current_amount = 35
+        self.assertEqual(35, self.ammo.current_amount)
+
+    def test_set_current_amount_above_max_stack_raises_exception(self):
+        with self.assertRaisesRegex(ValueError, "Current amount can't exceed stack maximum .*"):
+            self.ammo.current_amount = 70
+
+    def test_set_amount_below_zero_raises_exception(self):
+        with self.assertRaisesRegex(ValueError, "Current amount can't be negative!"):
+            self.ammo.current_amount = - 5
+
+    def test_obj_as_str_representation(self):
+        correct_str_print = "ID: ammo, tags: stackable, ammo, default, name: Ammo, description: Default ammo., " \
+                            "amount: 30 / 50, value: 1 (30), weight: 0.01 (0.3)"
+        self.assertEqual(correct_str_print, self.ammo.__str__())
+
+
+class ConsumableTests(unittest.TestCase):
+
+    def setUp(self):
+        self.consumable = Consumable(item_id="consumable", tags="stackable, consumable, default", name="Consumable",
+                                     desc="Default consumable.", effect="healing", max_stack=5, current_amount=2,
+                                     value=10, weight=0.5)
+
+    def test_property_values(self):
+        self.assertEqual("consumable", self.consumable.item_id)
+        self.assertEqual("stackable, consumable, default", self.consumable.tags)
+        self.assertEqual("Consumable", self.consumable.name)
+        self.assertEqual("Default consumable.", self.consumable.desc)
+        self.assertEqual("healing", self.consumable.effect)
+        self.assertEqual(5, self.consumable.max_stack)
+        self.assertEqual(2, self.consumable.current_amount)
+        self.assertEqual(10, self.consumable.value)
+        self.assertEqual(0.5, self.consumable.weight)
+
+    def test_set_current_amount(self):
+        self.consumable.current_amount = 4
+        self.assertEqual(4, self.consumable.current_amount)
+
+    def test_set_current_amount_above_max_stack_raises_exception(self):
+        with self.assertRaisesRegex(ValueError, "Current amount can't exceed stack maximum .*"):
+            self.consumable.current_amount = 10
+
+    def test_set_amount_below_zero_raises_exception(self):
+        with self.assertRaisesRegex(ValueError, "Current amount can't be negative!"):
+            self.consumable.current_amount = - 5
+
+    def test_obj_as_str_representation(self):
+        correct_str_print = "ID: consumable, tags: stackable, consumable, default, name: Consumable, " \
+                            "description: Default consumable., effect: healing, amount: 2 / 5, value: 10 (20), " \
+                            "weight: 0.5 (1.0)"
+        self.assertEqual(correct_str_print, self.consumable.__str__())
 
 
 if __name__ == "__main__":
