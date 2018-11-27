@@ -52,14 +52,14 @@ class Ammo(Item, Stackable):
 
     def __init__(self, item_id, tags, name, desc, max_stack, current_amount, value, weight):
         """Initialize object instance with specified parameters.
-        :param item_id: ID of the armor
-        :param tags: tags associated with the armor
-        :param name: name of the armor
-        :param desc: quick description of the armor
+        :param item_id: ID of the ammo
+        :param tags: tags associated with the ammo
+        :param name: name of the ammo
+        :param desc: quick description of the ammo
         :param max_stack: stack maximum; how many can fit in one inventory slot
         :param current_amount: current amount in stack
         :param value: bartering value
-        :param weight: weight of the armor
+        :param weight: weight of the ammo
         """
         Item.__init__(self, item_id, tags, name, desc, value, weight)
         Stackable.__init__(self, max_stack, current_amount)
@@ -80,15 +80,15 @@ class Consumable(Item, Stackable):
 
     def __init__(self, item_id, tags, name, desc, effect, max_stack, current_amount, value, weight):
         """Initialize object instance with specified parameters.
-        :param item_id: ID of the armor
-        :param tags: tags associated with the armor
-        :param name: name of the armor
-        :param desc: quick description of the armor
+        :param item_id: ID of the consumable
+        :param tags: tags associated with the consumable
+        :param name: name of the consumable
+        :param desc: quick description of the consumable
         :param effect: effect applied when consumed
         :param max_stack: stack maximum; how many can fit in one inventory slot
         :param current_amount: current amount in stack
         :param value: bartering value
-        :param weight: weight of the armor
+        :param weight: weight of the consumable
         """
         Item.__init__(self, item_id, tags, name, desc, value, weight)
         Stackable.__init__(self, max_stack, current_amount)
