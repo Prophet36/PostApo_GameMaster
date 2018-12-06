@@ -9,7 +9,8 @@ class MeleeWeapon(Item, Weapon):
 
     def __init__(self, item_id, tags, name, desc, damage, effect, eff_chance, armor_pen, accuracy, ap_cost,
                  st_requirement, value, weight):
-        """Initialize object instance with specified parameters.
+        """Initializes object instance with specified parameters.
+
         :param item_id: ID of the weapon
         :param tags: tags associated with the weapon
         :param name: name of the weapon
@@ -34,28 +35,31 @@ class MeleeWeapon(Item, Weapon):
     def __str__(self):
         dmg_range = self.get_dmg_range()
         effect_chance = self.get_effect_chance()
-        return "ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), effect: {} with {} chance ({}%), " \
-               "penetration: {}, accuracy: {}, AP: {}, strength required: {}, value: {}, weight: {}" \
-               .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
-                       self._effect, self._eff_chance, effect_chance, self._armor_pen, self._accuracy, self._ap_cost,
-                       self._st_requirement, self._value, self._weight)
+        return ("ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), effect: {} with {} chance ({}%), "
+                "penetration: {}, accuracy: {}, AP: {}, strength required: {}, value: {}, weight: {}"
+                .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
+                        self._effect, self._eff_chance, effect_chance, self._armor_pen, self._accuracy, self._ap_cost,
+                        self._st_requirement, self._value, self._weight))
 
     @property
     def effect(self):
-        """Get effect potentially applied by the weapon.
+        """Gets effect potentially applied by the weapon.
+
         :return: additional effect
         """
         return self._effect
 
     @property
     def eff_chance(self):
-        """Get weapon's chance to apply additional effect when target is successfully damaged.
+        """Gets weapon's chance to apply additional effect when target is successfully damaged.
+
         :return: effect chance
         """
         return self._eff_chance
 
     def get_effect_chance(self):
-        """Get weapon's chance to apply additional effect measured in percents.
+        """Gets weapon's chance to apply additional effect measured in percents.
+
         :return: effect chance in percents
         """
         eff_chance_values = self._eff_chance.split(" + ")
@@ -70,7 +74,8 @@ class RangedWeapon(Item, Weapon):
 
     def __init__(self, item_id, tags, name, desc, damage, ammo_type, clip_size, armor_pen, accuracy, ap_cost,
                  st_requirement, value, weight):
-        """Initialize object instance with specified parameters.
+        """Initializes object instance with specified parameters.
+
         :param item_id: ID of the weapon
         :param tags: tags associated with the weapon
         :param name: name of the weapon
@@ -94,29 +99,32 @@ class RangedWeapon(Item, Weapon):
 
     def __str__(self):
         dmg_range = self.get_dmg_range()
-        return "ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), penetration: {}, accuracy: {}, " \
-               "ammo: {} ({} / {}), AP: {}, strength required: {}, value: {}, weight: {}" \
-               .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
-                       self._armor_pen, self._accuracy, self._ammo_type, self._current_ammo, self._clip_size,
-                       self._ap_cost, self._st_requirement, self._value, self._weight)
+        return ("ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), penetration: {}, accuracy: {}, "
+                "ammo: {} ({} / {}), AP: {}, strength required: {}, value: {}, weight: {}"
+                .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
+                        self._armor_pen, self._accuracy, self._ammo_type, self._current_ammo, self._clip_size,
+                        self._ap_cost, self._st_requirement, self._value, self._weight))
 
     @property
     def ammo_type(self):
-        """Get type of ammunition the weapon uses.
+        """Gets type of ammunition the weapon uses.
+
         :return: ammunition type
         """
         return self._ammo_type
 
     @property
     def clip_size(self):
-        """Get size of weapon's clip (magazine).
+        """Gets size of weapon's clip (magazine).
+
         :return: clip (magazine) size
         """
         return self._clip_size
 
     @property
     def current_ammo(self):
-        """Get current amount of ammunition in weapon's clip (magazine).
+        """Gets current amount of ammunition in weapon's clip (magazine).
+
         :return: current ammunition in clip (magazine)
         """
         return self._current_ammo

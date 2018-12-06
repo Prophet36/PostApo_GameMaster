@@ -8,7 +8,8 @@ class Item(ABC):
 
     @abstractmethod
     def __init__(self, item_id, tags, name, desc, value, weight):
-        """Initialize object instance with specified parameters.
+        """Initializes object instance with specified parameters.
+
         :param item_id: ID of the item
         :param tags: tags associated with the item
         :param name: name of the item
@@ -25,42 +26,48 @@ class Item(ABC):
 
     @property
     def item_id(self):
-        """Get item's ID.
+        """Gets item's ID.
+
         :return: item's ID
         """
         return self._item_id
 
     @property
     def tags(self):
-        """Get item's tags.
+        """Gets item's tags.
+
         :return: item's tags
         """
         return self._tags
 
     @property
     def name(self):
-        """Get item's name.
+        """Gets item's name.
+
         :return: item's name
         """
         return self._name
 
     @property
     def desc(self):
-        """Get item's quick description.
+        """Gets item's quick description.
+
         :return: item's description
         """
         return self._desc
 
     @property
     def value(self):
-        """Get item's bartering value.
+        """Gets item's bartering value.
+
         :return: item's value
         """
         return self._value
 
     @property
     def weight(self):
-        """Get item's weight.
+        """Gets item's weight.
+
         :return: item's weight
         """
         return self._weight
@@ -72,7 +79,8 @@ class Armor(Item):
     """
 
     def __init__(self, item_id, tags, name, desc, dmg_res, rad_res, evasion, value, weight):
-        """Initialize object instance with specified parameters.
+        """Initializes object instance with specified parameters.
+
         :param item_id: ID of the armor
         :param tags: tags associated with the armor
         :param name: name of the armor
@@ -89,28 +97,31 @@ class Armor(Item):
         self._evasion = evasion
 
     def __str__(self):
-        return "ID: {}, tags: {}, name: {}, description: {}, damage resistance: {}, radiation resistance: {}, " \
-               "evasion: {}, value: {}, weight: {}" \
-               .format(self._item_id, self._tags, self._name, self._desc, self._dmg_res, self._rad_res, self._evasion,
-                       self._value, self._weight)
+        return ("ID: {}, tags: {}, name: {}, description: {}, damage resistance: {}, radiation resistance: {}, "
+                "evasion: {}, value: {}, weight: {}"
+                .format(self._item_id, self._tags, self._name, self._desc, self._dmg_res, self._rad_res, self._evasion,
+                        self._value, self._weight))
 
     @property
     def dmg_res(self):
-        """Get damage resistance provided by the armor.
+        """Gets damage resistance provided by the armor.
+
         :return: damage resistance
         """
         return self._dmg_res
 
     @property
     def rad_res(self):
-        """Get radiation resistance provided by the armor (measured in percents).
+        """Gets radiation resistance provided by the armor (measured in percents).
+
         :return: radiation resistance
         """
         return self._rad_res
 
     @property
     def evasion(self):
-        """Get evasion bonus provided by the armor.
+        """Gets evasion bonus provided by the armor.
+
         :return: evasion bonus
         """
         return self._evasion
@@ -123,7 +134,8 @@ class Weapon(ABC):
 
     @abstractmethod
     def __init__(self, damage, armor_pen, accuracy, ap_cost, st_requirement):
-        """Initialize object instance with specified parameters.
+        """Initializes object instance with specified parameters.
+
         :param damage: damage dealt by weapon; formatted as A + XdY, where A is base damage, X is number of Y-sided dice
                        rolls (A is omitted when it would be 0, while X is omitted when it would be 1)
         :param armor_pen: armor penetration
@@ -139,41 +151,47 @@ class Weapon(ABC):
 
     @property
     def damage(self):
-        """Get weapon's damage formula.
+        """Gets weapon's damage formula.
+
         :return: damage formula
         """
         return self._damage
 
     @property
     def armor_pen(self):
-        """Get weapon's armor penetration.
+        """Gets weapon's armor penetration.
+
         :return: armor penetration
         """
         return self._armor_pen
 
     @property
     def accuracy(self):
-        """Get weapon's bonus (malus) to accuracy.
+        """Gets weapon's bonus (malus) to accuracy.
+
         :return: bonus (malus) to accuracy
         """
         return self._accuracy
 
     @property
     def ap_cost(self):
-        """Get weapon's attack action points cost.
+        """Gets weapon's attack action points cost.
+
         :return: action points cost of attack
         """
         return self._ap_cost
 
     @property
     def st_requirement(self):
-        """Get weapon's strength requirement.
+        """Gets weapon's strength requirement.
+
         :return: strength requirement
         """
         return self._st_requirement
 
     def get_dmg_range(self):
-        """Get weapon's minimum and maximum damage range.
+        """Calculates and returns weapon's minimum and maximum damage range.
+
         :return: damage range as tuple of minimum and maximum damage
         """
         dmg_values = self._damage.split(" + ")

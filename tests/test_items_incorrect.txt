@@ -1,0 +1,34 @@
+# armor #
+
+id:                    incorrect_armor
+tags:                  armor, test
+name:                  Armor
+description:           Test armor.
+damage_resistance:     none
+radiation_resistance:  10
+evasion:               0
+value:                 10
+weight:                2.5
+
+# weapons - melee #
+
+id:                    incorrect_melee
+tags:                  weapon, melee, sharp, test
+name:                  Melee
+description:           Test melee.
+damage:                2 + 4d6
+effect:                bleed_minor
+effect_chance:         -6 + d10
+accuracy:              0
+action_points_cost:    10
+strength_requirement:  1
+value:                 5
+weight:                1.0
+
+# weapons - guns #
+
+id:                    incorrect_gun
+tags:                  weapon, gun, short, test
+name:                  Gun
+description:           Test gun.
+damage:                2 + 4d6
