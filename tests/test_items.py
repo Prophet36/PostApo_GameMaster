@@ -103,7 +103,7 @@ class RangedWeaponTests(unittest.TestCase):
 
     def setUp(self):
         self.weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                                   damage="2 + 4d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10,
+                                   damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
                                    ap_cost=10, st_requirement=1, value=10, weight=2.0)
 
     def test_property_values(self):
@@ -112,10 +112,10 @@ class RangedWeaponTests(unittest.TestCase):
         self.assertEqual("Gun", self.weapon.name)
         self.assertEqual("Test gun.", self.weapon.desc)
         self.assertEqual("2 + 4d6", self.weapon.damage)
-        self.assertEqual(0, self.weapon.armor_pen)
-        self.assertEqual(0, self.weapon.accuracy)
         self.assertEqual("ammo", self.weapon.ammo_type)
         self.assertEqual(10, self.weapon.clip_size)
+        self.assertEqual(0, self.weapon.armor_pen)
+        self.assertEqual(0, self.weapon.accuracy)
         self.assertEqual(0, self.weapon.current_ammo)
         self.assertEqual(10, self.weapon.ap_cost)
         self.assertEqual(1, self.weapon.st_requirement)
@@ -128,28 +128,28 @@ class RangedWeaponTests(unittest.TestCase):
 
     def test_damage_range_with_full_damage_formula_single_roll(self):
         weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                              damage="2 + d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10, ap_cost=10,
+                              damage="2 + d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
                               st_requirement=1, value=10, weight=2.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((3, 8), damage_range)
 
     def test_damage_range_with_multiple_rolls_only(self):
         weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                              damage="4d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10, ap_cost=10,
+                              damage="4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
                               st_requirement=1, value=10, weight=2.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((4, 24), damage_range)
 
     def test_damage_range_with_single_roll_only(self):
         weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                              damage="d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10, ap_cost=10,
+                              damage="d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
                               st_requirement=1, value=10, weight=2.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((1, 6), damage_range)
 
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: gun, tags: weapon, gun, short, test, name: Gun, description: Test gun., damage: "
-                             "2 + 4d6 (6 - 26), penetration: 0, accuracy: 0, ammo: ammo (0 / 10), AP: 10, "
+                             "2 + 4d6 (6 - 26), ammo: ammo (0 / 10), penetration: 0, accuracy: 0, AP: 10, "
                              "strength required: 1, value: 10, weight: 2.0")
         self.assertEqual(correct_str_print, self.weapon.__str__())
 
@@ -182,11 +182,11 @@ class AmmoTests(unittest.TestCase):
         self.assertEqual(35, self.ammo.current_amount)
 
     def test_set_current_amount_above_max_stack_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Current amount can't exceed stack maximum .*"):
+        with self.assertRaisesRegex(ValueError, "Error! Current amount can't exceed stack maximum .*"):
             self.ammo.current_amount = 70
 
     def test_set_amount_below_zero_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Current amount can't be negative!"):
+        with self.assertRaisesRegex(ValueError, "Error! Current amount can't be negative!"):
             self.ammo.current_amount = - 5
 
     def test_obj_as_str_representation(self):
@@ -218,11 +218,11 @@ class ConsumableTests(unittest.TestCase):
         self.assertEqual(4, self.consumable.current_amount)
 
     def test_set_current_amount_above_max_stack_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Current amount can't exceed stack maximum .*"):
+        with self.assertRaisesRegex(ValueError, "Error! Current amount can't exceed stack maximum .*"):
             self.consumable.current_amount = 10
 
     def test_set_amount_below_zero_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Current amount can't be negative!"):
+        with self.assertRaisesRegex(ValueError, "Error! Current amount can't be negative!"):
             self.consumable.current_amount = - 5
 
     def test_obj_as_str_representation(self):

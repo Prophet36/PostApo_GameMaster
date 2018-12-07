@@ -42,9 +42,9 @@ class Stackable(ABC):
         :raises ValueError: when value to set current stack to is either negative or exceeds stack maximum
         """
         if value < 0:
-            raise ValueError("Current amount can't be negative!")
+            raise ValueError("Error! Current amount can't be negative!")
         elif value > self._max_stack:
-            raise ValueError("Current amount can't exceed stack maximum ({})!".format(self._max_stack))
+            raise ValueError("Error! Current amount can't exceed stack maximum ({})!".format(self._max_stack))
         else:
             self._current_amount = value
 

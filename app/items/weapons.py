@@ -99,10 +99,10 @@ class RangedWeapon(Item, Weapon):
 
     def __str__(self):
         dmg_range = self.get_dmg_range()
-        return ("ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), penetration: {}, accuracy: {}, "
-                "ammo: {} ({} / {}), AP: {}, strength required: {}, value: {}, weight: {}"
+        return ("ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), ammo: {} ({} / {}), "
+                "penetration: {}, accuracy: {}, AP: {}, strength required: {}, value: {}, weight: {}"
                 .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
-                        self._armor_pen, self._accuracy, self._ammo_type, self._current_ammo, self._clip_size,
+                        self._ammo_type, self._current_ammo, self._clip_size, self._armor_pen, self._accuracy,
                         self._ap_cost, self._st_requirement, self._value, self._weight))
 
     @property
