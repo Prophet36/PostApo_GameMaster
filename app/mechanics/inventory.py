@@ -49,12 +49,12 @@ class Inventory:
 
     @equipped_armor.setter
     def equipped_armor(self, armor_to_equip):
-        """Sets equipped armor to provided object.
+        """Sets equipped armor to provided object or none.
 
         :param armor_to_equip: Armor object to equip
         :raises InventoryError: when provided object type is incorrect
         """
-        if isinstance(armor_to_equip, Armor):
+        if isinstance(armor_to_equip, Armor) or armor_to_equip is None:
             self._equipped_armor = armor_to_equip
         else:
             raise Inventory.InventoryError("Error! Incorrect object type to equip!")
@@ -69,12 +69,12 @@ class Inventory:
 
     @equipped_weapon.setter
     def equipped_weapon(self, weapon_to_equip):
-        """Sets equipped weapon to provided object.
+        """Sets equipped weapon to provided object or none.
 
         :param weapon_to_equip: Weapon derived object to equip
         :raises InventoryError: when provided object type is incorrect
         """
-        if isinstance(weapon_to_equip, Weapon):
+        if isinstance(weapon_to_equip, Weapon) or weapon_to_equip is None:
             self._equipped_weapon = weapon_to_equip
         else:
             raise Inventory.InventoryError("Error! Incorrect object type to equip!")
@@ -154,8 +154,8 @@ class InventoryEquipper:
     Items can only be equipped from within specified inventory, and currently equipped item will then swap places with
     specified item to be equipped (from equipped slot to a list of carried items).
 
-    The class uses Inventory class' InventoryError exception, which is raised when equipping incorrect item type, or
-    equipping item not existing in specified inventory.
+    The class uses Inventory class' InventoryError exception, which is raised when equipping incorrect item type,
+    equipping item not existing in specified inventory or specified inventory is incorrect.
     """
 
     @staticmethod
@@ -209,3 +209,41 @@ class InventoryEquipper:
         else:
             idx = inventory.items.index(weapon_to_equip)
             inventory.items[idx], inventory.equipped_weapon = inventory.equipped_weapon, inventory.items[idx]
+
+
+class InventoryUnequipper:
+    """This class unequips armor and weapons in specified inventory.
+
+    Items that are unequipped are moving to inventory's list of carried items.
+
+    The class uses Inventory class' InventoryError exception, which is raised when specified inventory is incorrect or
+    items are already unequipped.
+    """
+
+    @staticmethod
+    def unequip_armor(inventory):
+        """Unequips armor in specified inventory and moves it to inventory's list of carried items.
+
+        :param inventory: Inventory object to unequip armor in
+        :raises InventoryError: when specified inventory is incorrect, or armor is already unequipped
+        """
+        if not isinstance(inventory, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if inventory.equipped_armor is None:
+            raise Inventory.InventoryError("Error! Can't unequip that!")
+        inventory.items.append(inventory.equipped_armor)
+        inventory.equipped_armor = None
+
+    @staticmethod
+    def unequip_weapon(inventory):
+        """Unequips weapon in specified inventory and moves it to inventory's list of carried items.
+
+        :param inventory: Inventory object to unequip armor in
+        :raises InventoryError: when specified inventory is incorrect, or weapon is already unequipped
+        """
+        if not isinstance(inventory, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if inventory.equipped_weapon is None:
+            raise Inventory.InventoryError("Error! Can't unequip that!")
+        inventory.items.append(inventory.equipped_weapon)
+        inventory.equipped_weapon = None

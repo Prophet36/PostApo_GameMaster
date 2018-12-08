@@ -3,7 +3,7 @@ import unittest
 from app.items.generic import Armor
 from app.items.stackables import Ammo
 from app.items.weapons import RangedWeapon
-from app.mechanics.inventory import Inventory, InventoryEquipper
+from app.mechanics.inventory import Inventory, InventoryEquipper, InventoryUnequipper
 
 
 class InventoryTests(unittest.TestCase):
@@ -168,6 +168,43 @@ class InventoryEquipperTests(unittest.TestCase):
     def test_incorrect_obj_as_inventory_raises_exception(self):
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
             InventoryEquipper.equip_item(inventory="not Inventory object", item_to_equip=self.inventory.items[0])
+
+
+class InventoryUnequipperTests(unittest.TestCase):
+
+    def setUp(self):
+        self.armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                           evasion=2, value=10, weight=2.5)
+        self.weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                                   damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
+                                   ap_cost=10, st_requirement=1, value=10, weight=2.0)
+        self.inventory = Inventory(armor=self.armor, weapon=self.weapon)
+
+    def test_unequip_armor(self):
+        self.assertIs(self.armor, self.inventory.equipped_armor)
+        InventoryUnequipper.unequip_armor(inventory=self.inventory)
+        self.assertIs(self.armor, self.inventory.items[0])
+
+    def test_unequip_weapon(self):
+        self.assertIs(self.weapon, self.inventory.equipped_weapon)
+        InventoryUnequipper.unequip_weapon(inventory=self.inventory)
+        self.assertIs(self.weapon, self.inventory.items[0])
+
+    def test_unequip_already_unequipped_armor_raises_exception(self):
+        InventoryUnequipper.unequip_armor(inventory=self.inventory)
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unequip that!"):
+            InventoryUnequipper.unequip_armor(inventory=self.inventory)
+
+    def test_unequip_already_unequipped_weapon_raises_exception(self):
+        InventoryUnequipper.unequip_weapon(inventory=self.inventory)
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unequip that!"):
+            InventoryUnequipper.unequip_weapon(inventory=self.inventory)
+
+    def test_incorrect_obj_as_inventory_raises_exception(self):
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+            InventoryUnequipper.unequip_armor(inventory="not Inventory object")
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+            InventoryUnequipper.unequip_weapon(inventory="not Inventory object")
 
 
 if __name__ == "__main__":
