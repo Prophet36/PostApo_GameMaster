@@ -47,6 +47,18 @@ class Inventory:
         """
         return self._equipped_armor
 
+    @equipped_armor.setter
+    def equipped_armor(self, armor_to_equip):
+        """Sets equipped armor to provided object.
+
+        :param armor_to_equip: Armor object to equip
+        :raises InventoryError: when provided object type is incorrect
+        """
+        if isinstance(armor_to_equip, Armor):
+            self._equipped_armor = armor_to_equip
+        else:
+            raise Inventory.InventoryError("Error! Incorrect object type to equip!")
+
     @property
     def equipped_weapon(self):
         """Gets equipped weapon as Weapon derived object.
@@ -54,6 +66,18 @@ class Inventory:
         :return: Weapon derived object representing equipped weapon
         """
         return self._equipped_weapon
+
+    @equipped_weapon.setter
+    def equipped_weapon(self, weapon_to_equip):
+        """Sets equipped weapon to provided object.
+
+        :param weapon_to_equip: Weapon derived object to equip
+        :raises InventoryError: when provided object type is incorrect
+        """
+        if isinstance(weapon_to_equip, Weapon):
+            self._equipped_weapon = weapon_to_equip
+        else:
+            raise Inventory.InventoryError("Error! Incorrect object type to equip!")
 
     @property
     def items(self):
@@ -124,3 +148,64 @@ class Inventory:
         return str_representation
 
 
+class InventoryEquipper:
+    """This class equips armor and weapons in specified inventory.
+
+    Items can only be equipped from within specified inventory, and currently equipped item will then swap places with
+    specified item to be equipped (from equipped slot to a list of carried items).
+
+    The class uses Inventory class' InventoryError exception, which is raised when equipping incorrect item type, or
+    equipping item not existing in specified inventory.
+    """
+
+    @staticmethod
+    def equip_item(inventory, item_to_equip):
+        """Equips specified item in specified inventory.
+
+        Specified inventory must be an instance of Inventory class, and item to equip must be Armor or Weapon derived
+        class object (for equipping armor and weapon respectively).
+
+        :param inventory: Inventory object to equip item in
+        :param item_to_equip: Armor or Weapon derived object to equip
+        :raises InventoryError: when specified inventory or item to equip is incorrect
+        """
+        if not isinstance(inventory, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if isinstance(item_to_equip, Armor):
+            InventoryEquipper._equip_armor(inventory, item_to_equip)
+        elif isinstance(item_to_equip, Weapon):
+            InventoryEquipper._equip_weapon(inventory, item_to_equip)
+        else:
+            raise Inventory.InventoryError("Error! Can't equip this type of item!")
+
+    @staticmethod
+    def _equip_armor(inventory, armor_to_equip):
+        """Equips specified armor in specified inventory.
+
+        Specified armor must be in inventory's list of carried items to be equipped.
+
+        :param inventory: Inventory object to equip armor in
+        :param armor_to_equip: Armor object to equip
+        :raises InventoryError: when specified armor to equip is not in inventory
+        """
+        if armor_to_equip not in inventory.items:
+            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+        else:
+            idx = inventory.items.index(armor_to_equip)
+            inventory.items[idx], inventory.equipped_armor = inventory.equipped_armor, inventory.items[idx]
+
+    @staticmethod
+    def _equip_weapon(inventory, weapon_to_equip):
+        """Equips specified weapon in specified inventory.
+
+        Specified weapon must be in inventory's list of carried items to be equipped.
+
+        :param inventory: Inventory object to equip weapon in
+        :param weapon_to_equip: Weapon derived object to equip
+        :raises InventoryError: when specified weapon to equip is not in inventory
+        """
+        if weapon_to_equip not in inventory.items:
+            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+        else:
+            idx = inventory.items.index(weapon_to_equip)
+            inventory.items[idx], inventory.equipped_weapon = inventory.equipped_weapon, inventory.items[idx]
