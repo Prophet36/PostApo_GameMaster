@@ -16,7 +16,7 @@ class Stackable(ABC):
         :param current_amount: current amount in stack
         """
         self._max_stack = max_stack
-        self._current_amount = current_amount
+        self.current_amount = current_amount
 
     @property
     def max_stack(self):

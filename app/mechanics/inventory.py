@@ -1,4 +1,5 @@
 from app.items.generic import Item, Armor, Weapon
+from app.items.stackables import Stackable
 from app.items.weapons import MeleeWeapon, RangedWeapon
 
 
@@ -15,16 +16,14 @@ class Inventory:
         """This exception class exist to unify all errors and exceptions occurring during inventory manipulation."""
         pass
 
-    def __init__(self, armor, weapon, items=None):
-        """Initializes instance of the class while adding provided armor, weapon and optional items to inventory.
+    def __init__(self, armor, weapon):
+        """Initializes instance of the class with provided armor and weapon as default equipped items.
 
-        Provided armor and weapon must be Armor and Weapon derived objects, respectively. Optional items can also be
-        provided (as a single, list or tuple of Item derived objects).
+        Provided armor and weapon must be Armor and Weapon derived objects, respectively.
 
         :param armor: armor to be equipped, as Armor object
         :param weapon: weapon to be equipped, as Weapon derived object
-        :param items: item(s) to be carried, as single, list or tuple of Item derived objects
-        :raises InventoryError: when provided armor or weapon is of incorrect type
+        :raises InventoryError: when provided armor or weapon object is of incorrect type
         """
         if isinstance(armor, Armor) and (isinstance(weapon, MeleeWeapon) or isinstance(weapon, RangedWeapon)):
             self._equipped_armor = armor
@@ -32,12 +31,6 @@ class Inventory:
         else:
             raise Inventory.InventoryError("Error! Incorrect object type(s) to create inventory with!")
         self._items = list()
-        if items is not None:
-            if isinstance(items, list) or isinstance(items, tuple):
-                for item in items:
-                    self.add_item(item)
-            else:
-                self.add_item(items)
 
     @property
     def equipped_armor(self):
@@ -72,7 +65,7 @@ class Inventory:
         """Sets equipped weapon to provided object or none.
 
         :param weapon_to_equip: Weapon derived object to equip
-        :raises InventoryError: when provided object type is incorrect
+        :raises InventoryError: when provided object is incorrect
         """
         if isinstance(weapon_to_equip, Weapon) or weapon_to_equip is None:
             self._equipped_weapon = weapon_to_equip
@@ -87,68 +80,106 @@ class Inventory:
         """
         return self._items
 
-    def add_item(self, item_to_add):
-        """Adds provided item to inventory's list of carried items.
-
-        :param item_to_add: Item derived object to add to inventory
-        :raises InventoryError: when provided item is of incorrect type
-        """
-        if isinstance(item_to_add, Item):
-            self._items.append(item_to_add)
-        else:
-            raise Inventory.InventoryError("Error! Incorrect object type to add to inventory!")
-
-    def remove_item(self, item_to_remove):
-        """Removes specified item from inventory's list of carried items.
-
-        Item can be chosen either as a reference to particular Item derived object, or index of list of Item derived
-        objects.
-
-        :param item_to_remove: reference to Item derived object or index of list of carried items
-        """
-        if isinstance(item_to_remove, int):
-            self._remove_item_by_index(item_index=item_to_remove)
-        else:
-            self._remove_item_by_reference(item_reference=item_to_remove)
-
-    def _remove_item_by_index(self, item_index):
-        """Removes item from inventory's list of carried items at specified index.
-
-        :param item_index: index of list to remove item from
-        :raises InventoryError: when specified index is incorrect
-        """
-        try:
-            self._items.pop(item_index)
-        except IndexError:
-            raise Inventory.InventoryError("Error! Incorrect inventory index!")
-
-    def _remove_item_by_reference(self, item_reference):
-        """Removes specified item from inventory's list of carried items by passed reference.
-
-        Items can only be removed from list of carried items, equipped armor and weapon can't be removed.
-
-        :param item_reference: reference of Item derived object in inventory to remove
-        :raises InventoryError: when passed reference is incorrect (either this item is not in inventory, or reference
-                                to equipped armor or weapon is passed)
-        """
-        if item_reference == self._equipped_armor or item_reference == self._equipped_weapon:
-            raise Inventory.InventoryError("Error! Can't remove currently equipped item!")
-        else:
-            try:
-                self._items.remove(item_reference)
-            except ValueError:
-                raise Inventory.InventoryError("Error! This item does not exist in inventory!")
-
     def __str__(self):
-        str_representation = "Armor: {}\nWeapon: {}".format(self._equipped_armor.name, self._equipped_weapon.name)
+        str_representation = "Armor: {}\nWeapon: {}\nItems:".format(self._equipped_armor.name,
+                                                                    self._equipped_weapon.name)
         if len(self._items) > 0:
-            str_representation += "\nItems:"
             for idx, item in enumerate(self._items):
                 str_representation += "\n{}: {}".format(idx + 1, item.name)
+        else:
+            str_representation += "\nNone"
         return str_representation
 
 
-class InventoryEquipper:
+class InventoryItemAdder:
+    """This class adds items to specified inventory.
+
+    The class uses Inventory class' InventoryError exception, which is raised when adding incorrect item type or
+    specified inventory is incorrect.
+    """
+
+    @staticmethod
+    def add_item(inv, item_to_add):
+        """Adds provided item to specified inventory's list of carried items.
+
+        :param inv: Inventory object to add item in
+        :param item_to_add: Item derived object to add to inventory
+        :raises InventoryError: when specified inventory or item is incorrect
+        """
+        if not isinstance(inv, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if isinstance(item_to_add, Item):
+            item_to_add_id = item_to_add.item_id
+            if isinstance(item_to_add, Stackable):
+                InventoryItemAdder._add_stackable(inv=inv, stackable_to_add=item_to_add, stackable_id=item_to_add_id)
+            else:
+                InventoryItemAdder._add_item(inv=inv, item_to_add=item_to_add)
+
+        else:
+            raise Inventory.InventoryError("Error! Incorrect object type to add to inventory!")
+
+    @staticmethod
+    def _add_stackable(inv, stackable_to_add, stackable_id):
+        """Adds provided stackable item to specified inventory's list of carried items.
+
+        Stackables are added by first checking if there are already stackables of the same type in inventory in order to
+        merge or fill existing stacks, if possible. For example, already having 2 / 5 of one stackable item and adding
+        additional 1 / 5 of the same item will result in one stack with 3 / 5, instead of two stacks. In another
+        example, having 3 / 5 of some item and adding 4 / 5 will result in filling original stack to 5 / 5 and leaving
+        the rest 2 / 5 in the other.
+
+        :param inv: Inventory object to add stackable item to
+        :param stackable_to_add: Stackable derived object to add to inventory
+        :param stackable_id: ID of the stackable item
+        """
+        for item in inv.items:
+            if item.item_id == stackable_id:
+                available_amount = item.max_stack - item.current_amount
+                if available_amount >= stackable_to_add.current_amount:
+                    item.current_amount += stackable_to_add.current_amount
+                    break
+                else:
+                    item.current_amount = item.max_stack
+                    stackable_to_add.current_amount -= available_amount
+        else:
+            InventoryItemAdder._add_item(inv=inv, item_to_add=stackable_to_add)
+
+    @staticmethod
+    def _add_item(inv, item_to_add):
+        """Adds provided item to specified inventory by appending to list of carried items.
+
+        :param inv: Inventory object to add item to
+        :param item_to_add: Item derived object to add to inventory's list of carried items
+        """
+        inv.items.append(item_to_add)
+
+
+class InventoryItemRemover:
+    """This class removes items from specified inventory.
+
+    Items are removed by passing its reference. Only items in inventory's list of carried items can be removed.
+
+    The class uses Inventory class' InventoryError exception, which is raised when removing incorrect item or
+    specified inventory is incorrect.
+    """
+
+    @staticmethod
+    def remove_item(inv, item_to_remove):
+        """Removes specified item from specified inventory's list of carried items.
+
+        :param inv: Inventory object to remove item from
+        :param item_to_remove: reference to Item derived object to remove from inventory
+        :raises InventoryError: when specified inventory or item is incorrect
+        """
+        if not isinstance(inv, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        try:
+            inv.items.remove(item_to_remove)
+        except ValueError:
+            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+
+
+class InventoryItemEquipper:
     """This class equips armor and weapons in specified inventory.
 
     Items can only be equipped from within specified inventory, and currently equipped item will then swap places with
@@ -159,59 +190,59 @@ class InventoryEquipper:
     """
 
     @staticmethod
-    def equip_item(inventory, item_to_equip):
+    def equip_item(inv, item_to_equip):
         """Equips specified item in specified inventory.
 
         Specified inventory must be an instance of Inventory class, and item to equip must be Armor or Weapon derived
         class object (for equipping armor and weapon respectively).
 
-        :param inventory: Inventory object to equip item in
+        :param inv: Inventory object to equip item in
         :param item_to_equip: Armor or Weapon derived object to equip
         :raises InventoryError: when specified inventory or item to equip is incorrect
         """
-        if not isinstance(inventory, Inventory):
+        if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
         if isinstance(item_to_equip, Armor):
-            InventoryEquipper._equip_armor(inventory, item_to_equip)
+            InventoryItemEquipper._equip_armor(inv, item_to_equip)
         elif isinstance(item_to_equip, Weapon):
-            InventoryEquipper._equip_weapon(inventory, item_to_equip)
+            InventoryItemEquipper._equip_weapon(inv, item_to_equip)
         else:
             raise Inventory.InventoryError("Error! Can't equip this type of item!")
 
     @staticmethod
-    def _equip_armor(inventory, armor_to_equip):
+    def _equip_armor(inv, armor_to_equip):
         """Equips specified armor in specified inventory.
 
         Specified armor must be in inventory's list of carried items to be equipped.
 
-        :param inventory: Inventory object to equip armor in
+        :param inv: Inventory object to equip armor in
         :param armor_to_equip: Armor object to equip
         :raises InventoryError: when specified armor to equip is not in inventory
         """
-        if armor_to_equip not in inventory.items:
+        if armor_to_equip not in inv.items:
             raise Inventory.InventoryError("Error! This item does not exist in inventory!")
         else:
-            idx = inventory.items.index(armor_to_equip)
-            inventory.items[idx], inventory.equipped_armor = inventory.equipped_armor, inventory.items[idx]
+            idx = inv.items.index(armor_to_equip)
+            inv.items[idx], inv.equipped_armor = inv.equipped_armor, inv.items[idx]
 
     @staticmethod
-    def _equip_weapon(inventory, weapon_to_equip):
+    def _equip_weapon(inv, weapon_to_equip):
         """Equips specified weapon in specified inventory.
 
         Specified weapon must be in inventory's list of carried items to be equipped.
 
-        :param inventory: Inventory object to equip weapon in
+        :param inv: Inventory object to equip weapon in
         :param weapon_to_equip: Weapon derived object to equip
         :raises InventoryError: when specified weapon to equip is not in inventory
         """
-        if weapon_to_equip not in inventory.items:
+        if weapon_to_equip not in inv.items:
             raise Inventory.InventoryError("Error! This item does not exist in inventory!")
         else:
-            idx = inventory.items.index(weapon_to_equip)
-            inventory.items[idx], inventory.equipped_weapon = inventory.equipped_weapon, inventory.items[idx]
+            idx = inv.items.index(weapon_to_equip)
+            inv.items[idx], inv.equipped_weapon = inv.equipped_weapon, inv.items[idx]
 
 
-class InventoryUnequipper:
+class InventoryItemUnequipper:
     """This class unequips armor and weapons in specified inventory.
 
     Items that are unequipped are moving to inventory's list of carried items.
@@ -221,29 +252,29 @@ class InventoryUnequipper:
     """
 
     @staticmethod
-    def unequip_armor(inventory):
+    def unequip_armor(inv):
         """Unequips armor in specified inventory and moves it to inventory's list of carried items.
 
-        :param inventory: Inventory object to unequip armor in
+        :param inv: Inventory object to unequip armor in
         :raises InventoryError: when specified inventory is incorrect, or armor is already unequipped
         """
-        if not isinstance(inventory, Inventory):
+        if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
-        if inventory.equipped_armor is None:
+        if inv.equipped_armor is None:
             raise Inventory.InventoryError("Error! Can't unequip that!")
-        inventory.items.append(inventory.equipped_armor)
-        inventory.equipped_armor = None
+        inv.items.append(inv.equipped_armor)
+        inv.equipped_armor = None
 
     @staticmethod
-    def unequip_weapon(inventory):
+    def unequip_weapon(inv):
         """Unequips weapon in specified inventory and moves it to inventory's list of carried items.
 
-        :param inventory: Inventory object to unequip armor in
+        :param inv: Inventory object to unequip armor in
         :raises InventoryError: when specified inventory is incorrect, or weapon is already unequipped
         """
-        if not isinstance(inventory, Inventory):
+        if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
-        if inventory.equipped_weapon is None:
+        if inv.equipped_weapon is None:
             raise Inventory.InventoryError("Error! Can't unequip that!")
-        inventory.items.append(inventory.equipped_weapon)
-        inventory.equipped_weapon = None
+        inv.items.append(inv.equipped_weapon)
+        inv.equipped_weapon = None
