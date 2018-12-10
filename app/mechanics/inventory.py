@@ -1,6 +1,7 @@
 from app.items.generic import Item, Armor, Weapon
-from app.items.stackables import Stackable
+from app.items.stackables import Stackable, Ammo
 from app.items.weapons import MeleeWeapon, RangedWeapon
+from app.config.game_config import get_default_armor, get_default_weapon
 
 
 class Inventory:
@@ -260,7 +261,7 @@ class InventoryItemUnequipper:
         """
         if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
-        if inv.equipped_armor is None:
+        if inv.equipped_armor is None or inv.equipped_armor.item_id == get_default_armor():
             raise Inventory.InventoryError("Error! Can't unequip that!")
         inv.items.append(inv.equipped_armor)
         inv.equipped_armor = None
@@ -274,7 +275,83 @@ class InventoryItemUnequipper:
         """
         if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
-        if inv.equipped_weapon is None:
+        if inv.equipped_weapon is None or inv.equipped_weapon.item_id == get_default_weapon():
             raise Inventory.InventoryError("Error! Can't unequip that!")
         inv.items.append(inv.equipped_weapon)
         inv.equipped_weapon = None
+
+
+class InventoryWeaponReloader:
+    """This class reloads weapons in specified inventory.
+
+    Only ranged weapons (guns, energy weapons) in inventory (either equipped weapon or in a list of carried items) can
+    be reloaded, when appropriate ammunition is found in inventory.
+
+    The class uses Inventory class' InventoryError exception, which is raised when reloading incorrect weapon types,
+    appropriate ammunition is not found or specified inventory is incorrect.
+    """
+
+    @staticmethod
+    def reload_weapon(inv, weapon_to_reload):
+        """Reloads specified weapon in specified inventory.
+
+        Specified inventory must be an instance of Inventory class, and weapon to reload must be RangedWeapon class
+        object. Only weapons that are not already fully loaded can be reloaded.
+
+        :param inv: Inventory object to reload weapon in
+        :param weapon_to_reload: RangedWeapon object to reload
+        :raises InventoryError: when specified inventory or weapon to reload is incorrect, or weapon is already fully
+                                loaded
+        """
+        if not isinstance(inv, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if isinstance(weapon_to_reload, RangedWeapon):
+            if weapon_to_reload not in inv.items and weapon_to_reload != inv.equipped_weapon:
+                raise Inventory.InventoryError("Error! This weapon does not exist in inventory!")
+            if weapon_to_reload.current_ammo != weapon_to_reload.clip_size:
+                InventoryWeaponReloader._reload_weapon(inv=inv, weapon_to_reload=weapon_to_reload)
+            else:
+                raise Inventory.InventoryError("Error! This weapon is already fully loaded!")
+        else:
+            raise Inventory.InventoryError("Error! Can't reload this type of item!")
+
+    @staticmethod
+    def _reload_weapon(inv, weapon_to_reload):
+        """Finds appropriate ammunition to reload specified weapon in specified inventory.
+
+        :param inv: Inventory object to reload weapon in
+        :param weapon_to_reload: RangedWeapon object to reload
+        :raises InventoryError: when appropriate ammunition is not found in specified inventory
+        """
+        ammo_type_to_reload_with = weapon_to_reload.ammo_type
+        amount_of_ammo_before_reloading = weapon_to_reload.current_ammo
+        for item in reversed(inv.items):
+            if item.item_id == ammo_type_to_reload_with:
+                InventoryWeaponReloader._load_ammo(inv=inv, ammo_to_load=item, weapon_to_reload=weapon_to_reload)
+                if weapon_to_reload.current_ammo == weapon_to_reload.clip_size:
+                    break
+        if amount_of_ammo_before_reloading == weapon_to_reload.current_ammo:
+            raise Inventory.InventoryError("Error! No {} ammo available to reload {}!".
+                                           format(ammo_type_to_reload_with, weapon_to_reload.name))
+
+    @staticmethod
+    def _load_ammo(inv, ammo_to_load, weapon_to_reload):
+        """Loads appropriate ammunition to specified weapon in specified inventory.
+
+        Amount of ammunition that is loaded to weapon is removed from inventory's list of carried items (removing
+        object in case of depleting whole stack).
+
+        :param inv: Inventory object to reload weapon in
+        :param ammo_to_load: Ammo object to load ammo from
+        :param weapon_to_reload: RangedWeapon object to reload
+        :raises InventoryError: when specified ammo is incorrect
+        """
+        if not isinstance(ammo_to_load, Ammo):
+            raise Inventory.InventoryError("Error! Incorrect object type to reload weapon with!")
+        ammo_shortage_in_clip = weapon_to_reload.clip_size - weapon_to_reload.current_ammo
+        if ammo_to_load.current_amount > ammo_shortage_in_clip:
+            ammo_to_load.current_amount -= ammo_shortage_in_clip
+            weapon_to_reload.current_ammo = weapon_to_reload.clip_size
+        else:
+            weapon_to_reload.current_ammo += ammo_to_load.current_amount
+            inv.items.remove(ammo_to_load)

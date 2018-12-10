@@ -147,6 +147,18 @@ class RangedWeaponTests(unittest.TestCase):
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((1, 6), damage_range)
 
+    def test_set_current_ammo_amount(self):
+        self.weapon.current_ammo = 5
+        self.assertEqual(5, self.weapon.current_ammo)
+
+    def test_set_current_ammo_amount_above_clip_size_raises_exception(self):
+        with self.assertRaisesRegex(ValueError, "Error! Current amount of ammunition can't exceed clip .* size .*"):
+            self.weapon.current_ammo = 15
+
+    def test_set_ammo_amount_below_zero_raises_exception(self):
+        with self.assertRaisesRegex(ValueError, "Error! Current amount of ammunition can't be negative!"):
+            self.weapon.current_ammo = -5
+
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: gun, tags: weapon, gun, short, test, name: Gun, description: Test gun., damage: "
                              "2 + 4d6 (6 - 26), ammo: ammo (0 / 10), penetration: 0, accuracy: 0, AP: 10, "
@@ -187,7 +199,7 @@ class AmmoTests(unittest.TestCase):
 
     def test_set_amount_below_zero_raises_exception(self):
         with self.assertRaisesRegex(ValueError, "Error! Current amount can't be negative!"):
-            self.ammo.current_amount = - 5
+            self.ammo.current_amount = -5
 
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: ammo, tags: ammo, stackable, test, name: Ammo, description: Test ammo., amount: "
@@ -223,7 +235,7 @@ class ConsumableTests(unittest.TestCase):
 
     def test_set_amount_below_zero_raises_exception(self):
         with self.assertRaisesRegex(ValueError, "Error! Current amount can't be negative!"):
-            self.consumable.current_amount = - 5
+            self.consumable.current_amount = -5
 
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: consumable, tags: consumable, stackable, test, name: Consumable, description: "

@@ -95,7 +95,7 @@ class RangedWeapon(Item, Weapon):
         Weapon.__init__(self, damage, armor_pen, accuracy, ap_cost, st_requirement)
         self._ammo_type = ammo_type
         self._clip_size = clip_size
-        self._current_ammo = 0
+        self.current_ammo = 0
 
     def __str__(self):
         dmg_range = self.get_dmg_range()
@@ -128,3 +128,18 @@ class RangedWeapon(Item, Weapon):
         :return: current ammunition in clip (magazine)
         """
         return self._current_ammo
+
+    @current_ammo.setter
+    def current_ammo(self, value):
+        """Sets current amount of ammunition in weapon's clip (magazine) to provided value.
+
+        :param value: value to set current amount of ammunition to
+        :raises ValueError: when value to set current amount of ammunition to is either negative or exceeds clip maximum
+        """
+        if value < 0:
+            raise ValueError("Error! Current amount of ammunition can't be negative!")
+        elif value > self._clip_size:
+            raise ValueError("Error! Current amount of ammunition can't exceed clip (magazine) size ({})!".
+                             format(self._clip_size))
+        else:
+            self._current_ammo = value
