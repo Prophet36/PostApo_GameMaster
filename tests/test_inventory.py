@@ -2,10 +2,10 @@ import unittest
 
 from app.items.generic import Armor
 from app.items.stackables import Ammo
-from app.items.weapons import RangedWeapon
+from app.items.weapons import MeleeWeapon, RangedWeapon
 from app.mechanics.inventory import Inventory, InventoryItemAdder, InventoryItemRemover
 from app.mechanics.inventory import InventoryItemEquipper, InventoryItemUnequipper
-from app.mechanics.inventory import InventoryWeaponReloader
+from app.mechanics.inventory import InventoryWeaponReloader, InventoryWeaponUnloader
 
 
 class InventoryTests(unittest.TestCase):
@@ -169,14 +169,14 @@ class InventoryItemEquipperTests(unittest.TestCase):
         self.assertIs(self.weapon, self.inventory.items[1])
 
     def test_equip_incorrect_item_type_raises_exception(self):
+        item_to_equip = self.inventory.items[2]
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't equip this type of item!"):
-            item_to_equip = self.inventory.items[2]
             InventoryItemEquipper.equip_item(inv=self.inventory, item_to_equip=item_to_equip)
 
     def test_equip_item_from_outside_current_inventory_raises_exception(self):
+        item_to_equip = Armor(item_id="armor", tags="armor, test", name="Outside Armor", desc="Test armor.",
+                              dmg_res=0, rad_res=10, evasion=2, value=10, weight=2.5)
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! This item does not exist in inventory!"):
-            item_to_equip = Armor(item_id="armor", tags="armor, test", name="Outside Armor", desc="Test armor.",
-                                  dmg_res=0, rad_res=10, evasion=2, value=10, weight=2.5)
             InventoryItemEquipper.equip_item(inv=self.inventory, item_to_equip=item_to_equip)
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
@@ -306,6 +306,14 @@ class InventoryWeaponReloaderTests(unittest.TestCase):
         self.assertEqual(45, self.inventory.items[0].current_amount)
         self.assertEqual(1, len(self.inventory.items))
 
+    def test_reload_fully_loaded_weapon_raises_exception(self):
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=50, value=1, weight=0.01)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=ammo)
+        InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon is already fully loaded!"):
+            InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
+
     def test_reload_weapon_with_no_ammo_available_raises_exception(self):
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! No .* ammo available to reload .*!"):
             InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
@@ -332,6 +340,92 @@ class InventoryWeaponReloaderTests(unittest.TestCase):
     def test_incorrect_obj_as_inventory_raises_exception(self):
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
             InventoryWeaponReloader.reload_weapon(inv="not Inventory object", weapon_to_reload="weapon to reload")
+
+
+class InventoryWeaponUnloaderTests(unittest.TestCase):
+
+    def setUp(self):
+        armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=10, value=1, weight=0.01)
+        self.inventory = Inventory(armor=armor, weapon=weapon)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=ammo)
+        InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
+
+    def test_unload_equipped_weapon(self):
+        self.assertEqual(10, self.inventory.equipped_weapon.current_ammo)
+        self.assertEqual(0, len(self.inventory.items))
+        InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.equipped_weapon,
+                                              data_file="test_items_correct.txt")
+        self.assertEqual(0, self.inventory.equipped_weapon.current_ammo)
+        self.assertEqual(1, len(self.inventory.items))
+        self.assertEqual(10, self.inventory.items[0].current_amount)
+
+    def test_unload_not_equipped_weapon(self):
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=10, value=1, weight=0.01)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=ammo)
+        InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.items[0])
+        self.assertEqual(10, self.inventory.items[0].current_ammo)
+        self.assertEqual(1, len(self.inventory.items))
+        InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.items[0],
+                                              data_file="test_items_correct.txt")
+        self.assertEqual(0, self.inventory.items[0].current_ammo)
+        self.assertEqual(2, len(self.inventory.items))
+        self.assertEqual(10, self.inventory.items[1].current_amount)
+
+    def test_unload_weapon_with_same_ammo_type_already_in_inventory(self):
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=30, value=1, weight=0.01)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=ammo)
+        self.assertEqual(30, self.inventory.items[0].current_amount)
+        InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.equipped_weapon,
+                                              data_file="test_items_correct.txt")
+        self.assertEqual(40, self.inventory.items[0].current_amount)
+
+    def test_unload_empty_weapon_raises_exception(self):
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon is already unloaded!"):
+            InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.items[0],
+                                                  data_file="test_items_correct.txt")
+
+    def test_unload_weapon_from_outside_inventory_raises_exception(self):
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon does not exist in inventory!"):
+            InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=weapon,
+                                                  data_file="test_items_correct.txt")
+
+    def test_unload_incorrect_weapon_type_raises_exception(self):
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+                             damage="2 + 4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
+                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unload this type of item!"):
+            InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.items[0],
+                                                  data_file="test_items_correct.txt")
+
+    def test_unload_weapon_fails_to_create_ammo_raises_exception(self):
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unload weapon and create .* ammo!"):
+            InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.equipped_weapon,
+                                                  data_file="test_items_incorrect.txt")
+
+    def test_incorrect_obj_as_inventory_raises_exception(self):
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+            InventoryWeaponUnloader.unload_weapon(inv="not Inventory object", weapon_to_unload="weapon to unload",
+                                                  data_file="test_items_correct.txt")
 
 
 if __name__ == "__main__":

@@ -68,7 +68,7 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual("Ammo", ammo.name)
         self.assertEqual("Test ammo.", ammo.desc)
         self.assertEqual(50, ammo.max_stack)
-        self.assertEqual(50, ammo.current_amount)
+        self.assertEqual(1, ammo.current_amount)
         self.assertEqual(1, ammo.value)
         self.assertEqual(0.01, ammo.weight)
 
@@ -81,7 +81,7 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual("Test consumable.", consumable.desc)
         self.assertEqual("none", consumable.effect)
         self.assertEqual(5, consumable.max_stack)
-        self.assertEqual(5, consumable.current_amount)
+        self.assertEqual(1, consumable.current_amount)
         self.assertEqual(10, consumable.value)
         self.assertEqual(0.5, consumable.weight)
 

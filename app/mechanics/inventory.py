@@ -1,4 +1,5 @@
 from app.items.generic import Item, Armor, Weapon
+from app.items.factory import ItemFactory
 from app.items.stackables import Stackable, Ammo
 from app.items.weapons import MeleeWeapon, RangedWeapon
 from app.config.game_config import get_default_armor, get_default_weapon
@@ -22,8 +23,8 @@ class Inventory:
 
         Provided armor and weapon must be Armor and Weapon derived objects, respectively.
 
-        :param armor: armor to be equipped, as Armor object
-        :param weapon: weapon to be equipped, as Weapon derived object
+        :param armor: Armor object representing equipped weapon
+        :param weapon: Weapon derived object representing equipped weapon
         :raises InventoryError: when provided armor or weapon object is of incorrect type
         """
         if isinstance(armor, Armor) and (isinstance(weapon, MeleeWeapon) or isinstance(weapon, RangedWeapon)):
@@ -158,7 +159,7 @@ class InventoryItemAdder:
 class InventoryItemRemover:
     """This class removes items from specified inventory.
 
-    Items are removed by passing its reference. Only items in inventory's list of carried items can be removed.
+    Only items in inventory's list of carried items can be removed.
 
     The class uses Inventory class' InventoryError exception, which is raised when removing incorrect item or
     specified inventory is incorrect.
@@ -169,7 +170,7 @@ class InventoryItemRemover:
         """Removes specified item from specified inventory's list of carried items.
 
         :param inv: Inventory object to remove item from
-        :param item_to_remove: reference to Item derived object to remove from inventory
+        :param item_to_remove: Item derived object to remove from inventory
         :raises InventoryError: when specified inventory or item is incorrect
         """
         if not isinstance(inv, Inventory):
@@ -204,9 +205,9 @@ class InventoryItemEquipper:
         if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
         if isinstance(item_to_equip, Armor):
-            InventoryItemEquipper._equip_armor(inv, item_to_equip)
+            InventoryItemEquipper._equip_armor(inv=inv, armor_to_equip=item_to_equip)
         elif isinstance(item_to_equip, Weapon):
-            InventoryItemEquipper._equip_weapon(inv, item_to_equip)
+            InventoryItemEquipper._equip_weapon(inv=inv, weapon_to_equip=item_to_equip)
         else:
             raise Inventory.InventoryError("Error! Can't equip this type of item!")
 
@@ -355,3 +356,60 @@ class InventoryWeaponReloader:
         else:
             weapon_to_reload.current_ammo += ammo_to_load.current_amount
             inv.items.remove(ammo_to_load)
+
+
+class InventoryWeaponUnloader:
+    """This class unloads weapons in specified inventory.
+
+    Only ranged weapons (guns, energy weapons) in inventory (either equipped weapon or in a list of carried items) can
+    be unloaded.
+
+    The class uses Inventory class' InventoryError exception, which is raised when unloading incorrect weapon types or
+    specified inventory is incorrect.
+    """
+    @staticmethod
+    def unload_weapon(inv, weapon_to_unload, data_file="items.txt"):
+        """Unloads specified weapon in specified inventory.
+
+        Specified inventory must be an instance of Inventory class, and weapon to unload must be RangedWeapon class
+        object. Only weapons that are not already unloaded can be reloaded.
+
+        :param inv: Inventory object to unload weapon in
+        :param weapon_to_unload: RangedWeapon object to unload
+        :param data_file: name of the file to obtain data to create Ammo object from (defaults to items.txt)
+        :raises InventoryError: when specified inventory or weapon to unload is incorrect, or weapon is already unloaded
+        """
+        if not isinstance(inv, Inventory):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if isinstance(weapon_to_unload, RangedWeapon):
+            if weapon_to_unload not in inv.items and weapon_to_unload != inv.equipped_weapon:
+                raise Inventory.InventoryError("Error! This weapon does not exist in inventory!")
+            if weapon_to_unload.current_ammo != 0:
+                InventoryWeaponUnloader._unload_weapon(inv=inv, weapon_to_unload=weapon_to_unload, data_file=data_file)
+            else:
+                raise Inventory.InventoryError("Error! This weapon is already unloaded!")
+        else:
+            raise Inventory.InventoryError("Error! Can't unload this type of item!")
+
+    @staticmethod
+    def _unload_weapon(inv, weapon_to_unload, data_file):
+        """Unloads specified weapon in specified inventory and adds ammo to inventory.
+
+        When weapon is unloaded, appropriate Ammo object is created in inventory, based on type of ammunition the
+        weapon uses.
+
+        :param inv: Inventory object to unload weapon in
+        :param weapon_to_unload: RangedWeapon object to unload
+        :param data_file: name of the file to obtain data to create Ammo object from (defaults to items.txt)
+        :raises InventoryError: when Ammo object can't be created
+        """
+        amount_of_ammo_in_clip = weapon_to_unload.current_ammo
+        ammo_to_create_id = weapon_to_unload.ammo_type
+        try:
+            unloaded_ammo = ItemFactory(data_file).create_item(item_id=ammo_to_create_id)
+            unloaded_ammo.current_amount = amount_of_ammo_in_clip
+            InventoryItemAdder.add_item(inv=inv, item_to_add=unloaded_ammo)
+        except ItemFactory.BuildError:
+            raise Inventory.InventoryError("Error! Can't unload weapon and create {} ammo!".format(ammo_to_create_id))
+        else:
+            weapon_to_unload.current_ammo = 0

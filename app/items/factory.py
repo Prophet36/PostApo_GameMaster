@@ -7,8 +7,8 @@ from app.items.weapons import MeleeWeapon, RangedWeapon
 class ItemFactory:
     """This class is responsible for generating items with their respective parameters based on obtained data.
 
-    The class obtains data on instantiation. Obtained data is a specially formatted text. This text contains list of all
-    items (weapons, consumables, etc) with their parameter values for the class to parse in order to create new
+    The class obtains data on instantiation. Obtained data is a specially formatted text, which contains list of all
+    items (weapons, consumables, etc) with their parameter values. The class to parses this data in order to create new
     instances of Item derived objects, based on item type.
 
     The class provides BuildError exception, which is raised whenever object instance can't be properly created due to
@@ -21,7 +21,7 @@ class ItemFactory:
 
     def __init__(self, data_file="items.txt"):
         """Initializes instance of the class and obtains item data from specified file. Sets data tracking parameters to
-        their default None value.
+        their default value.
 
         Data is obtained as a list of lines by FileHandler class. Data tracking parameters are used throughout item
         creation process to track positions of extracted item's ID and its parameters.
@@ -43,7 +43,7 @@ class ItemFactory:
         extracted from previously obtained data.
 
         :param item_id: ID of the item to find and create
-        :return: instance of Item derived class
+        :return: Item derived object
         :raises BuildError: when specified item ID is not found
         """
         for idx, line in enumerate(self._data):
@@ -55,10 +55,10 @@ class ItemFactory:
             raise ItemFactory.BuildError("Error! Can't create {}. Item does not exist!".format(item_id))
 
     def _create_found_item(self):
-        """Extracts previously found item's tags in order to call specific method to create instance of respective Item
-        derived class.
+        """Extracts previously found item's tags in order to call appropriate method to create instance of respective
+        Item derived class.
 
-        :return: respective instance of Item derived class
+        :return: Item derived object
         :raises BuildError: when type of item is incorrect (either due to missing or incorrect tags)
         """
         tags = self._get_item_tags()
@@ -86,7 +86,7 @@ class ItemFactory:
     def _create_armor(self):
         """Extracts parameter values and creates instance of Armor class with those parameters.
 
-        :return: instance of Armor class
+        :return: Armor object
         :raises BuildError: when extracted data can't be converted due to incorrect parameter value in obtained data
         """
         try:
@@ -107,7 +107,7 @@ class ItemFactory:
     def _create_melee_weapon(self):
         """Extracts parameter values and creates instance of MeleeWeapon class with those parameters.
 
-        :return: instance of MeleeWeapon class
+        :return: MeleeWeapon object
         :raises BuildError: when extracted data can't be converted due to incorrect parameter value in obtained data
         """
         try:
@@ -133,7 +133,7 @@ class ItemFactory:
     def _create_ranged_weapon(self):
         """Extracts parameter values and creates instance of RangedWeapon class with those parameters.
 
-        :return: instance of RangedWeapon class
+        :return: RangedWeapon object
         :raises BuildError: when extracted data can't be converted due to incorrect parameter value in obtained data
         """
         try:
@@ -159,7 +159,7 @@ class ItemFactory:
     def _create_ammo(self):
         """Extracts parameter values and creates instance of Ammo class with those parameters.
 
-        :return: instance of Ammo class
+        :return: Ammo object
         :raises BuildError: when extracted data can't be converted due to incorrect parameter value in obtained data
         """
         try:
@@ -168,7 +168,7 @@ class ItemFactory:
             name = self._get_parameter_value_from_data(parameter_name="name")
             desc = self._get_parameter_value_from_data(parameter_name="description")
             max_stack = int(self._get_parameter_value_from_data(parameter_name="max_stack"))
-            current_amount = max_stack
+            current_amount = 1
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
@@ -179,7 +179,7 @@ class ItemFactory:
     def _create_consumable(self):
         """Extracts parameter values and creates instance of Consumable class with those parameters.
 
-        :return: instance of Consumable class
+        :return: Consumable object
         :raises BuildError: when extracted data can't be converted due to incorrect parameter value in obtained data
         """
         try:
@@ -189,7 +189,7 @@ class ItemFactory:
             desc = self._get_parameter_value_from_data(parameter_name="description")
             effect = self._get_parameter_value_from_data(parameter_name="effect")
             max_stack = int(self._get_parameter_value_from_data(parameter_name="max_stack"))
-            current_amount = max_stack
+            current_amount = 1
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
@@ -199,9 +199,6 @@ class ItemFactory:
 
     def _get_parameter_value_from_data(self, parameter_name):
         """Extracts specified parameter value from obtained data.
-
-        Exception is thrown when name of the parameter is incorrect (either due to missing or incorrect parameter in
-        obtained data and incorrect order of parameters).
 
         :param parameter_name: name of the parameter in obtained data to extract value from
         :return: parameter value

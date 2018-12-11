@@ -5,7 +5,7 @@ class FileHandler:
 
     @staticmethod
     def get_file_contents_as_list(file_name):
-        """Extracts data from file and returns it as list of lines.
+        """Extracts data from specified file and returns it as list of lines.
 
         :param file_name: name of the file to extract data from
         :return: list of lines extracted from file
