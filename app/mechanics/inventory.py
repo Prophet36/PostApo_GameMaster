@@ -257,6 +257,8 @@ class InventoryItemUnequipper:
     def unequip_armor(inv):
         """Unequips armor in specified inventory and moves it to inventory's list of carried items.
 
+        Default armor can't be unequipped.
+
         :param inv: Inventory object to unequip armor in
         :raises InventoryError: when specified inventory is incorrect, or armor is already unequipped
         """
@@ -270,6 +272,8 @@ class InventoryItemUnequipper:
     @staticmethod
     def unequip_weapon(inv):
         """Unequips weapon in specified inventory and moves it to inventory's list of carried items.
+
+        Default weapon can't be unequipped.
 
         :param inv: Inventory object to unequip armor in
         :raises InventoryError: when specified inventory is incorrect, or weapon is already unequipped
@@ -367,6 +371,7 @@ class InventoryWeaponUnloader:
     The class uses Inventory class' InventoryError exception, which is raised when unloading incorrect weapon types or
     specified inventory is incorrect.
     """
+
     @staticmethod
     def unload_weapon(inv, weapon_to_unload, data_file="items.txt"):
         """Unloads specified weapon in specified inventory.
@@ -413,3 +418,82 @@ class InventoryWeaponUnloader:
             raise Inventory.InventoryError("Error! Can't unload weapon and create {} ammo!".format(ammo_to_create_id))
         else:
             weapon_to_unload.current_ammo = 0
+
+
+class InventoryItemMover:
+    """This class moves items between specified inventories.
+
+    All items can be moved between inventories, either equipped items (with the exception of default ones) or carried
+    items.
+
+    The class uses Inventory class' InventoryError exception, which is raised when moving incorrect item or any of the
+    specified inventories are incorrect.
+    """
+
+    @staticmethod
+    def move_item(inv_to_move_to, inv_to_move_from, item_to_move):
+        """Moves specified weapon between specified inventories.
+
+        Specified inventories must be instances of Inventory class, and item must be in inventory from which it is
+        moved from.
+
+        :param inv_to_move_to: Inventory object to move item from
+        :param inv_to_move_from: Inventory object to move item to
+        :param item_to_move: Item derived object to move
+        :raises InventoryError: when specified item or any of the specified inventories are incorrect, or specified
+                                inventories reference the same inventory
+        """
+        if not (isinstance(inv_to_move_to, Inventory) and isinstance(inv_to_move_from, Inventory)):
+            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+        if inv_to_move_to == inv_to_move_from:
+            raise Inventory.InventoryError("Error! Specified inventories can't be the same!")
+        if item_to_move in inv_to_move_from.items:
+            InventoryItemMover._move_item(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from,
+                                          item_to_move=item_to_move)
+        elif item_to_move == inv_to_move_from.equipped_armor:
+            InventoryItemMover._move_equipped_armor(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from)
+        elif item_to_move == inv_to_move_from.equipped_weapon:
+            InventoryItemMover._move_equipped_weapon(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from)
+        else:
+            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+
+    @staticmethod
+    def _move_item(inv_to_move_to, inv_to_move_from, item_to_move):
+        """Moves item from one inventory's list of carried items into another.
+
+        :param inv_to_move_to: Inventory object to move item from
+        :param inv_to_move_from: Inventory object to move item to
+        :param item_to_move: Item derived object to move
+        """
+        InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=item_to_move)
+        InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=item_to_move)
+
+    @staticmethod
+    def _move_equipped_armor(inv_to_move_from, inv_to_move_to):
+        """Moves equipped armor from one inventory to another inventory's list of carried items.
+
+        :param inv_to_move_to: Inventory object to move armor to
+        :param inv_to_move_from: Inventory object to move armor from
+        :raises InventoryError: when moving default armor
+        """
+        try:
+            InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=inv_to_move_from.equipped_armor)
+            InventoryItemUnequipper.unequip_armor(inv=inv_to_move_from)
+            InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=inv_to_move_from.items[-1])
+        except Inventory.InventoryError:
+            raise Inventory.InventoryError("Error! Can't move default armor!")
+
+    @staticmethod
+    def _move_equipped_weapon(inv_to_move_from, inv_to_move_to):
+        """Moves equipped weapon from one inventory to another inventory's list of carried items.
+
+        :param inv_to_move_to: Inventory object to move weapon to
+        :param inv_to_move_from: Inventory object to move weapon from
+        :raises InventoryError: when moving default weapon
+        """
+        try:
+            InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=inv_to_move_from.equipped_weapon)
+            InventoryItemUnequipper.unequip_weapon(inv=inv_to_move_from)
+            InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=inv_to_move_from.items[-1])
+        except Inventory.InventoryError:
+            raise Inventory.InventoryError("Error! Can't move default weapon!")

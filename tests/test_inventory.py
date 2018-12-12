@@ -6,6 +6,7 @@ from app.items.weapons import MeleeWeapon, RangedWeapon
 from app.mechanics.inventory import Inventory, InventoryItemAdder, InventoryItemRemover
 from app.mechanics.inventory import InventoryItemEquipper, InventoryItemUnequipper
 from app.mechanics.inventory import InventoryWeaponReloader, InventoryWeaponUnloader
+from app.mechanics.inventory import InventoryItemMover
 
 
 class InventoryTests(unittest.TestCase):
@@ -113,10 +114,10 @@ class InventoryItemRemoverTests(unittest.TestCase):
         self.inventory = Inventory(armor=armor, weapon=weapon)
 
     def test_remove_item(self):
-        item_to_add = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Pistol", desc="Test pistol.",
-                                   damage="2 + 4d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10,
-                                   ap_cost=10, st_requirement=1, value=10, weight=2.0)
-        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=item_to_add)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
         self.assertEqual(1, len(self.inventory.items))
         item_to_remove = self.inventory.items[0]
         InventoryItemRemover.remove_item(inv=self.inventory, item_to_remove=item_to_remove)
@@ -139,9 +140,9 @@ class InventoryItemEquipperTests(unittest.TestCase):
         self.weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
                                    damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
                                    ap_cost=10, st_requirement=1, value=10, weight=2.0)
-        self.equippable_armor = Armor(item_id="new_armor", tags="armor, test", name="New Armor", desc="Test armor.",
-                                      dmg_res=0, rad_res=10, evasion=2, value=10, weight=2.5)
-        self.equippable_weapon = RangedWeapon(item_id="new_gun", tags="weapon, gun, short, test", name="New gun",
+        self.equippable_armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0,
+                                      rad_res=10, evasion=2, value=10, weight=2.5)
+        self.equippable_weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun",
                                               desc="Test gun.", damage="2 + 4d6", ammo_type="ammo", clip_size=10,
                                               armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1, value=10,
                                               weight=2.0)
@@ -174,8 +175,8 @@ class InventoryItemEquipperTests(unittest.TestCase):
             InventoryItemEquipper.equip_item(inv=self.inventory, item_to_equip=item_to_equip)
 
     def test_equip_item_from_outside_current_inventory_raises_exception(self):
-        item_to_equip = Armor(item_id="armor", tags="armor, test", name="Outside Armor", desc="Test armor.",
-                              dmg_res=0, rad_res=10, evasion=2, value=10, weight=2.5)
+        item_to_equip = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0,
+                              rad_res=10, evasion=2, value=10, weight=2.5)
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! This item does not exist in inventory!"):
             InventoryItemEquipper.equip_item(inv=self.inventory, item_to_equip=item_to_equip)
 
@@ -426,6 +427,128 @@ class InventoryWeaponUnloaderTests(unittest.TestCase):
         with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
             InventoryWeaponUnloader.unload_weapon(inv="not Inventory object", weapon_to_unload="weapon to unload",
                                                   data_file="test_items_correct.txt")
+
+
+class InventoryItemMoverTests(unittest.TestCase):
+
+    def setUp(self):
+        armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=10, value=1, weight=0.01)
+        self.inventory_to_move_to = Inventory(armor=armor, weapon=weapon)
+        InventoryItemAdder.add_item(inv=self.inventory_to_move_to, item_to_add=ammo)
+        another_armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0,
+                              rad_res=10, evasion=2, value=10, weight=2.5)
+        another_weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                                      damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
+                                      ap_cost=10, st_requirement=1, value=10, weight=2.0)
+        additional_weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                                         damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
+                                         ap_cost=10, st_requirement=1, value=10, weight=2.0)
+        self.inventory_to_move_from = Inventory(armor=another_armor, weapon=another_weapon)
+        InventoryItemAdder.add_item(inv=self.inventory_to_move_from, item_to_add=additional_weapon)
+
+    def test_move_item(self):
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        item_to_move = self.inventory_to_move_from.items[0]
+        InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                     inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+        self.assertEqual(2, len(self.inventory_to_move_to.items))
+        self.assertEqual(0, len(self.inventory_to_move_from.items))
+        self.assertIs(item_to_move, self.inventory_to_move_to.items[1])
+
+    def test_move_same_type_stackable_merges_stacks(self):
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=20, value=1, weight=0.01)
+        InventoryItemAdder.add_item(inv=self.inventory_to_move_from, item_to_add=ammo)
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(2, len(self.inventory_to_move_from.items))
+        self.assertEqual(10, self.inventory_to_move_to.items[0].current_amount)
+        item_to_move = self.inventory_to_move_from.items[1]
+        InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                     inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        self.assertEqual(30, self.inventory_to_move_to.items[0].current_amount)
+
+    def test_move_same_type_stackable_fills_one_stack_leaving_rest_in_other(self):
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=45, value=1, weight=0.01)
+        InventoryItemAdder.add_item(inv=self.inventory_to_move_from, item_to_add=ammo)
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(2, len(self.inventory_to_move_from.items))
+        self.assertEqual(10, self.inventory_to_move_to.items[0].current_amount)
+        item_to_move = self.inventory_to_move_from.items[1]
+        InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                     inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+        self.assertEqual(2, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        self.assertEqual(50, self.inventory_to_move_to.items[0].current_amount)
+        self.assertEqual(5, self.inventory_to_move_to.items[1].current_amount)
+
+    def test_move_equipped_armor(self):
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        item_to_move = self.inventory_to_move_from.equipped_armor
+        InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                     inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+        self.assertEqual(2, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        self.assertIsNot(item_to_move, self.inventory_to_move_from.equipped_armor)
+        self.assertIs(item_to_move, self.inventory_to_move_to.items[1])
+
+    def test_move_equipped_weapon(self):
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        item_to_move = self.inventory_to_move_from.equipped_weapon
+        InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                     inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+        self.assertEqual(2, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        self.assertIsNot(item_to_move, self.inventory_to_move_from.equipped_weapon)
+        self.assertIs(item_to_move, self.inventory_to_move_to.items[1])
+
+    def test_move_default_quipped_armor_raises_exception(self):
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        InventoryItemUnequipper.unequip_armor(inv=self.inventory_to_move_from)
+        item_to_move = self.inventory_to_move_from.equipped_armor
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't move default armor!"):
+            InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                         inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+
+    def test_move_default_equipped_weapon_raises_exception(self):
+        self.assertEqual(1, len(self.inventory_to_move_to.items))
+        self.assertEqual(1, len(self.inventory_to_move_from.items))
+        InventoryItemUnequipper.unequip_weapon(inv=self.inventory_to_move_from)
+        item_to_move = self.inventory_to_move_from.equipped_weapon
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't move default weapon!"):
+            InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                         inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+
+    def test_move_item_from_outside_inventory_raises_exception(self):
+        item_to_move = self.inventory_to_move_to.items[0]
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This item does not exist in inventory!"):
+            InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                         inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
+
+    def test_same_obj_as_inventories_raises_exception(self):
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventories can't be the same!"):
+            InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                         inv_to_move_from=self.inventory_to_move_to, item_to_move="item to move")
+
+    def test_incorrect_obj_as_inventory_raises_exception(self):
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+            InventoryItemMover.move_item(inv_to_move_to="not Inventory object",
+                                         inv_to_move_from=self.inventory_to_move_from, item_to_move="item to move")
+        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+            InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
+                                         inv_to_move_from="not Inventory object", item_to_move="item to move")
 
 
 if __name__ == "__main__":
