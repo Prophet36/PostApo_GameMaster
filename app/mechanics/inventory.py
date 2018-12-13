@@ -31,7 +31,7 @@ class Inventory:
             self._equipped_armor = armor
             self._equipped_weapon = weapon
         else:
-            raise Inventory.InventoryError("Error! Incorrect object type(s) to create inventory with!")
+            raise Inventory.InventoryError("incorrect object type(s) to create inventory with")
         self._items = list()
 
     @property
@@ -52,7 +52,7 @@ class Inventory:
         if isinstance(armor_to_equip, Armor) or armor_to_equip is None:
             self._equipped_armor = armor_to_equip
         else:
-            raise Inventory.InventoryError("Error! Incorrect object type to equip!")
+            raise Inventory.InventoryError("incorrect object type to equip")
 
     @property
     def equipped_weapon(self):
@@ -72,7 +72,7 @@ class Inventory:
         if isinstance(weapon_to_equip, Weapon) or weapon_to_equip is None:
             self._equipped_weapon = weapon_to_equip
         else:
-            raise Inventory.InventoryError("Error! Incorrect object type to equip!")
+            raise Inventory.InventoryError("incorrect object type to equip")
 
     @property
     def items(self):
@@ -109,16 +109,15 @@ class InventoryItemAdder:
         :raises InventoryError: when specified inventory or item is incorrect
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if isinstance(item_to_add, Item):
             item_to_add_id = item_to_add.item_id
             if isinstance(item_to_add, Stackable):
                 InventoryItemAdder._add_stackable(inv=inv, stackable_to_add=item_to_add, stackable_id=item_to_add_id)
             else:
                 InventoryItemAdder._add_item(inv=inv, item_to_add=item_to_add)
-
         else:
-            raise Inventory.InventoryError("Error! Incorrect object type to add to inventory!")
+            raise Inventory.InventoryError("incorrect object type to add to inventory")
 
     @staticmethod
     def _add_stackable(inv, stackable_to_add, stackable_id):
@@ -174,11 +173,11 @@ class InventoryItemRemover:
         :raises InventoryError: when specified inventory or item is incorrect
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         try:
             inv.items.remove(item_to_remove)
         except ValueError:
-            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+            raise Inventory.InventoryError("no such item in inventory")
 
 
 class InventoryItemEquipper:
@@ -203,13 +202,13 @@ class InventoryItemEquipper:
         :raises InventoryError: when specified inventory or item to equip is incorrect
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if isinstance(item_to_equip, Armor):
             InventoryItemEquipper._equip_armor(inv=inv, armor_to_equip=item_to_equip)
         elif isinstance(item_to_equip, Weapon):
             InventoryItemEquipper._equip_weapon(inv=inv, weapon_to_equip=item_to_equip)
         else:
-            raise Inventory.InventoryError("Error! Can't equip this type of item!")
+            raise Inventory.InventoryError("incorrect object type to equip")
 
     @staticmethod
     def _equip_armor(inv, armor_to_equip):
@@ -222,7 +221,7 @@ class InventoryItemEquipper:
         :raises InventoryError: when specified armor to equip is not in inventory
         """
         if armor_to_equip not in inv.items:
-            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+            raise Inventory.InventoryError("no such item in inventory")
         else:
             idx = inv.items.index(armor_to_equip)
             inv.items[idx], inv.equipped_armor = inv.equipped_armor, inv.items[idx]
@@ -238,7 +237,7 @@ class InventoryItemEquipper:
         :raises InventoryError: when specified weapon to equip is not in inventory
         """
         if weapon_to_equip not in inv.items:
-            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+            raise Inventory.InventoryError("no such item in inventory")
         else:
             idx = inv.items.index(weapon_to_equip)
             inv.items[idx], inv.equipped_weapon = inv.equipped_weapon, inv.items[idx]
@@ -263,9 +262,9 @@ class InventoryItemUnequipper:
         :raises InventoryError: when specified inventory is incorrect, or armor is already unequipped
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if inv.equipped_armor is None or inv.equipped_armor.item_id == get_default_armor():
-            raise Inventory.InventoryError("Error! Can't unequip that!")
+            raise Inventory.InventoryError("can't unequip default armor")
         inv.items.append(inv.equipped_armor)
         inv.equipped_armor = None
 
@@ -279,9 +278,9 @@ class InventoryItemUnequipper:
         :raises InventoryError: when specified inventory is incorrect, or weapon is already unequipped
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if inv.equipped_weapon is None or inv.equipped_weapon.item_id == get_default_weapon():
-            raise Inventory.InventoryError("Error! Can't unequip that!")
+            raise Inventory.InventoryError("can't unequip default weapon")
         inv.items.append(inv.equipped_weapon)
         inv.equipped_weapon = None
 
@@ -309,16 +308,16 @@ class InventoryWeaponReloader:
                                 loaded
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if isinstance(weapon_to_reload, RangedWeapon):
             if weapon_to_reload not in inv.items and weapon_to_reload != inv.equipped_weapon:
-                raise Inventory.InventoryError("Error! This weapon does not exist in inventory!")
+                raise Inventory.InventoryError("no such weapon in inventory")
             if weapon_to_reload.current_ammo != weapon_to_reload.clip_size:
                 InventoryWeaponReloader._reload_weapon(inv=inv, weapon_to_reload=weapon_to_reload)
             else:
-                raise Inventory.InventoryError("Error! This weapon is already fully loaded!")
+                raise Inventory.InventoryError("weapon is already fully loaded")
         else:
-            raise Inventory.InventoryError("Error! Can't reload this type of item!")
+            raise Inventory.InventoryError("incorrect object type to reload")
 
     @staticmethod
     def _reload_weapon(inv, weapon_to_reload):
@@ -336,7 +335,7 @@ class InventoryWeaponReloader:
                 if weapon_to_reload.current_ammo == weapon_to_reload.clip_size:
                     break
         if amount_of_ammo_before_reloading == weapon_to_reload.current_ammo:
-            raise Inventory.InventoryError("Error! No {} ammo available to reload {}!".
+            raise Inventory.InventoryError("no available ammo: {} to reload weapon: {}".
                                            format(ammo_type_to_reload_with, weapon_to_reload.name))
 
     @staticmethod
@@ -352,7 +351,7 @@ class InventoryWeaponReloader:
         :raises InventoryError: when specified ammo is incorrect
         """
         if not isinstance(ammo_to_load, Ammo):
-            raise Inventory.InventoryError("Error! Incorrect object type to reload weapon with!")
+            raise Inventory.InventoryError("incorrect object type for ammo")
         ammo_shortage_in_clip = weapon_to_reload.clip_size - weapon_to_reload.current_ammo
         if ammo_to_load.current_amount > ammo_shortage_in_clip:
             ammo_to_load.current_amount -= ammo_shortage_in_clip
@@ -385,16 +384,16 @@ class InventoryWeaponUnloader:
         :raises InventoryError: when specified inventory or weapon to unload is incorrect, or weapon is already unloaded
         """
         if not isinstance(inv, Inventory):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if isinstance(weapon_to_unload, RangedWeapon):
             if weapon_to_unload not in inv.items and weapon_to_unload != inv.equipped_weapon:
-                raise Inventory.InventoryError("Error! This weapon does not exist in inventory!")
+                raise Inventory.InventoryError("no such weapon in inventory")
             if weapon_to_unload.current_ammo != 0:
                 InventoryWeaponUnloader._unload_weapon(inv=inv, weapon_to_unload=weapon_to_unload, data_file=data_file)
             else:
-                raise Inventory.InventoryError("Error! This weapon is already unloaded!")
+                raise Inventory.InventoryError("weapon is already unloaded")
         else:
-            raise Inventory.InventoryError("Error! Can't unload this type of item!")
+            raise Inventory.InventoryError("incorrect object type to unload")
 
     @staticmethod
     def _unload_weapon(inv, weapon_to_unload, data_file):
@@ -412,11 +411,11 @@ class InventoryWeaponUnloader:
         ammo_to_create_id = weapon_to_unload.ammo_type
         try:
             unloaded_ammo = ItemFactory(data_file).create_item(item_id=ammo_to_create_id)
+        except ItemFactory.BuildError:
+            raise Inventory.InventoryError("incorrect item ID for ammo: {}".format(ammo_to_create_id))
+        else:
             unloaded_ammo.current_amount = amount_of_ammo_in_clip
             InventoryItemAdder.add_item(inv=inv, item_to_add=unloaded_ammo)
-        except ItemFactory.BuildError:
-            raise Inventory.InventoryError("Error! Can't unload weapon and create {} ammo!".format(ammo_to_create_id))
-        else:
             weapon_to_unload.current_ammo = 0
 
 
@@ -444,9 +443,9 @@ class InventoryItemMover:
                                 inventories reference the same inventory
         """
         if not (isinstance(inv_to_move_to, Inventory) and isinstance(inv_to_move_from, Inventory)):
-            raise Inventory.InventoryError("Error! Specified inventory is incorrect!")
+            raise Inventory.InventoryError("incorrect object type for inventory")
         if inv_to_move_to == inv_to_move_from:
-            raise Inventory.InventoryError("Error! Specified inventories can't be the same!")
+            raise Inventory.InventoryError("both inventories reference the same object")
         if item_to_move in inv_to_move_from.items:
             InventoryItemMover._move_item(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from,
                                           item_to_move=item_to_move)
@@ -455,7 +454,7 @@ class InventoryItemMover:
         elif item_to_move == inv_to_move_from.equipped_weapon:
             InventoryItemMover._move_equipped_weapon(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from)
         else:
-            raise Inventory.InventoryError("Error! This item does not exist in inventory!")
+            raise Inventory.InventoryError("no such item in inventory")
 
     @staticmethod
     def _move_item(inv_to_move_to, inv_to_move_from, item_to_move):
@@ -476,12 +475,14 @@ class InventoryItemMover:
         :param inv_to_move_from: Inventory object to move armor from
         :raises InventoryError: when moving default armor
         """
+        item_to_move = inv_to_move_from.equipped_armor
         try:
-            InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=inv_to_move_from.equipped_armor)
             InventoryItemUnequipper.unequip_armor(inv=inv_to_move_from)
-            InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=inv_to_move_from.items[-1])
         except Inventory.InventoryError:
-            raise Inventory.InventoryError("Error! Can't move default armor!")
+            raise Inventory.InventoryError("can't move default armor")
+        else:
+            InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=item_to_move)
+            InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=inv_to_move_from.items[-1])
 
     @staticmethod
     def _move_equipped_weapon(inv_to_move_from, inv_to_move_to):
@@ -491,9 +492,11 @@ class InventoryItemMover:
         :param inv_to_move_from: Inventory object to move weapon from
         :raises InventoryError: when moving default weapon
         """
+        item_to_move = inv_to_move_from.equipped_weapon
         try:
-            InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=inv_to_move_from.equipped_weapon)
             InventoryItemUnequipper.unequip_weapon(inv=inv_to_move_from)
-            InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=inv_to_move_from.items[-1])
         except Inventory.InventoryError:
-            raise Inventory.InventoryError("Error! Can't move default weapon!")
+            raise Inventory.InventoryError("can't move default weapon")
+        else:
+            InventoryItemAdder.add_item(inv=inv_to_move_to, item_to_add=item_to_move)
+            InventoryItemRemover.remove_item(inv=inv_to_move_from, item_to_remove=inv_to_move_from.items[-1])

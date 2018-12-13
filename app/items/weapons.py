@@ -144,9 +144,9 @@ class RangedWeapon(Item, Weapon):
         :raises ValueError: when value to set current amount of ammunition to is either negative or exceeds clip maximum
         """
         if value < 0:
-            raise ValueError("Error! Current amount of ammunition can't be negative!")
+            raise ValueError("current amount of ammunition can't be negative")
         elif value > self._clip_size:
-            raise ValueError("Error! Current amount of ammunition can't exceed clip (magazine) size ({})!".
+            raise ValueError("current amount of ammunition can't exceed clip (magazine) size: {}".
                              format(self._clip_size))
         else:
             self._current_ammo = value

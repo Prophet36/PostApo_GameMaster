@@ -32,7 +32,7 @@ class ItemFactory:
         try:
             self._data = FileHandler.get_file_contents_as_list(data_file)
         except FileNotFoundError:
-            raise ItemFactory.BuildError("Error! Item data is unavailable!")
+            raise ItemFactory.BuildError("item data is unavailable")
         else:
             self._line_number_containing_item_id = None
             self._line_number_containing_last_data = None
@@ -52,7 +52,7 @@ class ItemFactory:
                 self._item_id_to_find = item_id
                 return self._create_found_item()
         else:
-            raise ItemFactory.BuildError("Error! Can't create {}. Item does not exist!".format(item_id))
+            raise ItemFactory.BuildError("incorrect item ID")
 
     def _create_found_item(self):
         """Extracts previously found item's tags in order to call appropriate method to create instance of respective
@@ -74,7 +74,7 @@ class ItemFactory:
         elif "consumable" in tags:
             return self._create_consumable()
         else:
-            raise ItemFactory.BuildError("Error! Can't create {}. Incorrect item type!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("incorrect item type for item: {}".format(self._item_id_to_find))
 
     def _get_item_tags(self):
         """Extracts and returns previously found item's tags.
@@ -100,7 +100,7 @@ class ItemFactory:
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
-            raise ItemFactory.BuildError("Error! Can't create {}. Incorrect item data!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("incorrect parameter data for item: {}".format(self._item_id_to_find))
         else:
             return Armor(item_id, tags, name, desc, dmg_res, rad_res, evasion, value, weight)
 
@@ -125,7 +125,7 @@ class ItemFactory:
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
-            raise ItemFactory.BuildError("Error! Can't create {}. Incorrect item data!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("incorrect parameter data for item: {}".format(self._item_id_to_find))
         else:
             return MeleeWeapon(item_id, tags, name, desc, damage, effect, eff_chance, armor_pen, accuracy, ap_cost,
                                st_requirement, value, weight)
@@ -151,7 +151,7 @@ class ItemFactory:
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
-            raise ItemFactory.BuildError("Error! Can't create {}. Incorrect item data!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("incorrect parameter data for item: {}".format(self._item_id_to_find))
         else:
             return RangedWeapon(item_id, tags, name, desc, damage, ammo_type, clip_size, armor_pen, accuracy, ap_cost,
                                 st_requirement, value, weight)
@@ -172,7 +172,7 @@ class ItemFactory:
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
-            raise ItemFactory.BuildError("Error! Can't create {}. Incorrect item data!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("incorrect parameter data for item: {}".format(self._item_id_to_find))
         else:
             return Ammo(item_id, tags, name, desc, max_stack, current_amount, value, weight)
 
@@ -193,7 +193,7 @@ class ItemFactory:
             value = int(self._get_parameter_value_from_data(parameter_name="value"))
             weight = float(self._get_parameter_value_from_data(parameter_name="weight"))
         except ValueError:
-            raise ItemFactory.BuildError("Error! Can't create {}. Incorrect item data!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("incorrect parameter data for item: {}".format(self._item_id_to_find))
         else:
             return Consumable(item_id, tags, name, desc, effect, max_stack, current_amount, value, weight)
 
@@ -207,12 +207,12 @@ class ItemFactory:
         try:
             parameter_data = self._data[self._line_number_containing_last_data]
         except IndexError:
-            raise ItemFactory.BuildError("Error! Can't create {}. Not enough item data!".format(self._item_id_to_find))
+            raise ItemFactory.BuildError("missing item data for item: {}".format(self._item_id_to_find))
         else:
             if (parameter_name + ":") in parameter_data:
                 parameter_value = " ".join(self._data[self._line_number_containing_last_data].split()[1:])
                 self._line_number_containing_last_data += 1
                 return parameter_value
             else:
-                raise ItemFactory.BuildError("Error! Can't create {}. Missing item data!".
-                                             format(self._item_id_to_find))
+                raise ItemFactory.BuildError("incorrect parameter name: {} for item: {}"
+                                             .format(parameter_name, self._item_id_to_find))

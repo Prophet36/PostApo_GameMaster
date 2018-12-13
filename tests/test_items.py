@@ -165,11 +165,11 @@ class RangedWeaponTests(unittest.TestCase):
         self.assertEqual(5, self.weapon.current_ammo)
 
     def test_set_current_ammo_amount_above_clip_size_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Error! Current amount of ammunition can't exceed clip .* size .*"):
+        with self.assertRaisesRegex(ValueError, "current amount of ammunition can't exceed clip .* size: .*"):
             self.weapon.current_ammo = 15
 
     def test_set_ammo_amount_below_zero_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Error! Current amount of ammunition can't be negative!"):
+        with self.assertRaisesRegex(ValueError, "current amount of ammunition can't be negative"):
             self.weapon.current_ammo = -5
 
     def test_obj_as_str_representation(self):
@@ -207,11 +207,11 @@ class AmmoTests(unittest.TestCase):
         self.assertEqual(35, self.ammo.current_amount)
 
     def test_set_current_amount_above_max_stack_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Error! Current amount can't exceed stack maximum .*"):
+        with self.assertRaisesRegex(ValueError, "current amount can't exceed stack maximum: .*"):
             self.ammo.current_amount = 70
 
     def test_set_amount_below_zero_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Error! Current amount can't be negative!"):
+        with self.assertRaisesRegex(ValueError, "current amount can't be negative"):
             self.ammo.current_amount = -5
 
     def test_obj_as_str_representation(self):
@@ -243,11 +243,11 @@ class ConsumableTests(unittest.TestCase):
         self.assertEqual(4, self.consumable.current_amount)
 
     def test_set_current_amount_above_max_stack_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Error! Current amount can't exceed stack maximum .*"):
+        with self.assertRaisesRegex(ValueError, "current amount can't exceed stack maximum: .*"):
             self.consumable.current_amount = 10
 
     def test_set_amount_below_zero_raises_exception(self):
-        with self.assertRaisesRegex(ValueError, "Error! Current amount can't be negative!"):
+        with self.assertRaisesRegex(ValueError, "current amount can't be negative"):
             self.consumable.current_amount = -5
 
     def test_obj_as_str_representation(self):

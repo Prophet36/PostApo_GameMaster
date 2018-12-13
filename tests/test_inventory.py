@@ -26,9 +26,9 @@ class InventoryTests(unittest.TestCase):
         self.assertIs(self.weapon, self.inventory.equipped_weapon)
 
     def test_create_inventory_instance_with_incorrect_obj_types_for_equipped_items_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Incorrect object .* to create inventory with!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object .* to create inventory with"):
             Inventory(armor="not Armor class object", weapon=self.weapon)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Incorrect object .* to create inventory with!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object .* to create inventory with"):
             Inventory(armor=self.armor, weapon="not Weapon derived class object")
 
     def test_obj_as_str_representation(self):
@@ -95,11 +95,11 @@ class InventoryItemAdderTests(unittest.TestCase):
 
     def test_add_incorrect_obj_as_item_raises_exception(self):
         item_to_add = "not Item derived class object"
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Incorrect object type to add to inventory!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type to add to inventory"):
             InventoryItemAdder.add_item(inv=self.inventory, item_to_add=item_to_add)
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemAdder.add_item(inv="not Inventory object", item_to_add="item to add")
 
 
@@ -124,11 +124,11 @@ class InventoryItemRemoverTests(unittest.TestCase):
         self.assertEqual(0, len(self.inventory.items))
 
     def test_remove_incorrect_item_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This item does not exist in inventory!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "no such item in inventory"):
             InventoryItemRemover.remove_item(inv=self.inventory, item_to_remove="incorrect item")
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemRemover.remove_item(inv="not Inventory object", item_to_remove="item to remove")
 
 
@@ -171,17 +171,17 @@ class InventoryItemEquipperTests(unittest.TestCase):
 
     def test_equip_incorrect_item_type_raises_exception(self):
         item_to_equip = self.inventory.items[2]
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't equip this type of item!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type to equip"):
             InventoryItemEquipper.equip_item(inv=self.inventory, item_to_equip=item_to_equip)
 
     def test_equip_item_from_outside_current_inventory_raises_exception(self):
         item_to_equip = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0,
                               rad_res=10, evasion=2, value=10, weight=2.5)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This item does not exist in inventory!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "no such item in inventory"):
             InventoryItemEquipper.equip_item(inv=self.inventory, item_to_equip=item_to_equip)
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemEquipper.equip_item(inv="not Inventory object", item_to_equip=self.inventory.items[0])
 
 
@@ -207,18 +207,18 @@ class InventoryItemUnequipperTests(unittest.TestCase):
 
     def test_unequip_already_unequipped_armor_raises_exception(self):
         InventoryItemUnequipper.unequip_armor(inv=self.inventory)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unequip that!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "can't unequip default armor"):
             InventoryItemUnequipper.unequip_armor(inv=self.inventory)
 
     def test_unequip_already_unequipped_weapon_raises_exception(self):
         InventoryItemUnequipper.unequip_weapon(inv=self.inventory)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unequip that!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "can't unequip default weapon"):
             InventoryItemUnequipper.unequip_weapon(inv=self.inventory)
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemUnequipper.unequip_armor(inv="not Inventory object")
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemUnequipper.unequip_weapon(inv="not Inventory object")
 
 
@@ -312,34 +312,34 @@ class InventoryWeaponReloaderTests(unittest.TestCase):
                     current_amount=50, value=1, weight=0.01)
         InventoryItemAdder.add_item(inv=self.inventory, item_to_add=ammo)
         InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon is already fully loaded!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "weapon is already fully loaded"):
             InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
 
     def test_reload_weapon_with_no_ammo_available_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! No .* ammo available to reload .*!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "no available ammo: .* to reload weapon: .*"):
             InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
 
     def test_reload_weapon_from_outside_current_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon does not exist in inventory!"):
-            weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                                  damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
-                                  st_requirement=1, value=10, weight=2.0)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        with self.assertRaisesRegex(Inventory.InventoryError, "no such weapon in inventory"):
             InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=weapon)
 
     def test_reload_incorrect_weapon_type_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't reload this type of item!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type to reload"):
             InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload="weapon to reload")
 
     def test_reload_weapon_with_incorrect_ammo_type_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Incorrect object type to reload weapon with!"):
-            incorrect_ammo = RangedWeapon(item_id="ammo", tags="weapon, gun, short, test", name="Ammo",
-                                          desc="Test ammo.", damage="2 + 4d6", ammo_type="ammo", clip_size=10,
-                                          armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1, value=10, weight=2.0)
-            InventoryItemAdder.add_item(inv=self.inventory, item_to_add=incorrect_ammo)
+        incorrect_ammo = RangedWeapon(item_id="ammo", tags="weapon, gun, short, test", name="Ammo",
+                                      desc="Test ammo.", damage="2 + 4d6", ammo_type="ammo", clip_size=10,
+                                      armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1, value=10, weight=2.0)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=incorrect_ammo)
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for ammo"):
             InventoryWeaponReloader.reload_weapon(inv=self.inventory, weapon_to_reload=self.inventory.equipped_weapon)
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryWeaponReloader.reload_weapon(inv="not Inventory object", weapon_to_reload="weapon to reload")
 
 
@@ -397,7 +397,7 @@ class InventoryWeaponUnloaderTests(unittest.TestCase):
                               damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
                               st_requirement=1, value=10, weight=2.0)
         InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon is already unloaded!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "weapon is already unloaded"):
             InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.items[0],
                                                   data_file="test_items_correct.txt")
 
@@ -405,7 +405,7 @@ class InventoryWeaponUnloaderTests(unittest.TestCase):
         weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
                               damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
                               st_requirement=1, value=10, weight=2.0)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This weapon does not exist in inventory!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "no such weapon in inventory"):
             InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=weapon,
                                                   data_file="test_items_correct.txt")
 
@@ -414,17 +414,17 @@ class InventoryWeaponUnloaderTests(unittest.TestCase):
                              damage="2 + 4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
                              ap_cost=10, st_requirement=1, value=5, weight=1.0)
         InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unload this type of item!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type to unload"):
             InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.items[0],
                                                   data_file="test_items_correct.txt")
 
     def test_unload_weapon_fails_to_create_ammo_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't unload weapon and create .* ammo!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect item ID for ammo: .*"):
             InventoryWeaponUnloader.unload_weapon(inv=self.inventory, weapon_to_unload=self.inventory.equipped_weapon,
                                                   data_file="test_items_incorrect.txt")
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryWeaponUnloader.unload_weapon(inv="not Inventory object", weapon_to_unload="weapon to unload",
                                                   data_file="test_items_correct.txt")
 
@@ -518,7 +518,7 @@ class InventoryItemMoverTests(unittest.TestCase):
         self.assertEqual(1, len(self.inventory_to_move_from.items))
         InventoryItemUnequipper.unequip_armor(inv=self.inventory_to_move_from)
         item_to_move = self.inventory_to_move_from.equipped_armor
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't move default armor!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "can't move default armor"):
             InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
                                          inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
 
@@ -527,26 +527,26 @@ class InventoryItemMoverTests(unittest.TestCase):
         self.assertEqual(1, len(self.inventory_to_move_from.items))
         InventoryItemUnequipper.unequip_weapon(inv=self.inventory_to_move_from)
         item_to_move = self.inventory_to_move_from.equipped_weapon
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Can't move default weapon!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "can't move default weapon"):
             InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
                                          inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
 
     def test_move_item_from_outside_inventory_raises_exception(self):
         item_to_move = self.inventory_to_move_to.items[0]
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! This item does not exist in inventory!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "no such item in inventory"):
             InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
                                          inv_to_move_from=self.inventory_to_move_from, item_to_move=item_to_move)
 
     def test_same_obj_as_inventories_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventories can't be the same!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "both inventories reference the same object"):
             InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
                                          inv_to_move_from=self.inventory_to_move_to, item_to_move="item to move")
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemMover.move_item(inv_to_move_to="not Inventory object",
                                          inv_to_move_from=self.inventory_to_move_from, item_to_move="item to move")
-        with self.assertRaisesRegex(Inventory.InventoryError, "Error! Specified inventory is incorrect!"):
+        with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemMover.move_item(inv_to_move_to=self.inventory_to_move_to,
                                          inv_to_move_from="not Inventory object", item_to_move="item to move")
 

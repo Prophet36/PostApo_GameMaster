@@ -9,7 +9,7 @@ from app.items.weapons import MeleeWeapon, RangedWeapon
 class ItemFactoryTests(unittest.TestCase):
 
     def test_invalid_item_data_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "Error! Item data is unavailable!"):
+        with self.assertRaisesRegex(ItemFactory.BuildError, "item data is unavailable"):
             ItemFactory(data_file="invalid_file.txt")
 
     def test_create_armor(self):
@@ -86,19 +86,19 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual(0.5, consumable.weight)
 
     def test_invalid_item_id_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "Error! Can't create .*. Item does not exist!"):
+        with self.assertRaisesRegex(ItemFactory.BuildError, "incorrect item ID"):
             ItemFactory(data_file="test_items_correct.txt").create_item("invalid_id")
 
     def test_incorrect_item_data_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "Error! Can't create .*. Incorrect item data!"):
+        with self.assertRaisesRegex(ItemFactory.BuildError, "incorrect parameter data for item: .*"):
             ItemFactory(data_file="test_items_incorrect.txt").create_item("incorrect_armor")
 
     def test_missing_item_data_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "Error! Can't create .*. Missing item data!"):
+        with self.assertRaisesRegex(ItemFactory.BuildError, "incorrect parameter name: .* for item: .*"):
             ItemFactory(data_file="test_items_incorrect.txt").create_item("incorrect_melee")
 
     def test_missing_item_data_due_to_end_of_file_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "Error! Can't create .*. Not enough item data!"):
+        with self.assertRaisesRegex(ItemFactory.BuildError, "missing item data for item: .*"):
             ItemFactory(data_file="test_items_incorrect.txt").create_item("incorrect_gun")
 
 
