@@ -70,33 +70,46 @@ class MeleeWeaponTests(unittest.TestCase):
 
     def test_damage_range_with_full_damage_formula_single_roll(self):
         weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
-                             damage="2 + d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0,
-                             accuracy=0, ap_cost=10, st_requirement=1, value=5, weight=1.0)
+                             damage="2 + d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
+                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((3, 8), damage_range)
 
     def test_damage_range_with_multiple_rolls_only(self):
         weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
-                             damage="4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0,
-                             accuracy=0, ap_cost=10, st_requirement=1, value=5, weight=1.0)
+                             damage="4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
+                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((4, 24), damage_range)
 
     def test_damage_range_with_single_roll_only(self):
         weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
-                             damage="d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0,
-                             accuracy=0, ap_cost=10, st_requirement=1, value=5, weight=1.0)
+                             damage="d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
+                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((1, 6), damage_range)
 
     def test_effect_chance_in_percents(self):
         self.assertEqual(40, self.weapon.get_effect_chance())
 
+    def test_effect_chance_with_no_effect(self):
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+                             damage="d6", effect="none", eff_chance="0", armor_pen=0, accuracy=0, ap_cost=10,
+                             st_requirement=1, value=5, weight=1.0)
+        self.assertEqual(0, weapon.get_effect_chance())
+
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: melee, tags: weapon, melee, sharp, test, name: Melee, description: Test melee., "
-                             "damage: 2 + 4d6 (6 - 26), effect: bleed_minor with -6 + d10 chance (40%), penetration: "
+                             "damage: 2 + 4d6 (6 - 26), effect: bleed_minor, with -6 + d10 chance (40%), penetration: "
                              "0, accuracy: 0, AP: 10, strength required: 1, value: 5, weight: 1.0")
         self.assertEqual(correct_str_print, self.weapon.__str__())
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+                             damage="2 + 4d6", effect="none", eff_chance="0", armor_pen=0, accuracy=0, ap_cost=10,
+                             st_requirement=1, value=5, weight=1.0)
+        correct_str_print = ("ID: melee, tags: weapon, melee, sharp, test, name: Melee, description: Test melee., "
+                             "damage: 2 + 4d6 (6 - 26), effect: none, penetration: 0, accuracy: 0, AP: 10, "
+                             "strength required: 1, value: 5, weight: 1.0")
+        self.assertEqual(correct_str_print, weapon.__str__())
 
 
 class RangedWeaponTests(unittest.TestCase):

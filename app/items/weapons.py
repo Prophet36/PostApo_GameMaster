@@ -35,11 +35,15 @@ class MeleeWeapon(Item, Weapon):
     def __str__(self):
         dmg_range = self.get_dmg_range()
         effect_chance = self.get_effect_chance()
-        return ("ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), effect: {} with {} chance ({}%), "
-                "penetration: {}, accuracy: {}, AP: {}, strength required: {}, value: {}, weight: {}"
-                .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
-                        self._effect, self._eff_chance, effect_chance, self._armor_pen, self._accuracy, self._ap_cost,
-                        self._st_requirement, self._value, self._weight))
+        str_print = ("ID: {}, tags: {}, name: {}, description: {}, damage: {} ({} - {}), effect: {}, "
+                     .format(self._item_id, self._tags, self._name, self._desc, self._damage, dmg_range[0], dmg_range[1],
+                             self._effect))
+        if effect_chance != 0:
+            str_print += "with {} chance ({}%), ".format(self._eff_chance, effect_chance)
+        str_print += ("penetration: {}, accuracy: {}, AP: {}, strength required: {}, value: {}, weight: {}"
+                      .format(self._armor_pen, self._accuracy, self._ap_cost, self._st_requirement, self._value,
+                              self._weight))
+        return str_print
 
     @property
     def effect(self):
@@ -62,9 +66,12 @@ class MeleeWeapon(Item, Weapon):
 
         :return: effect chance in percents
         """
-        eff_chance_values = self._eff_chance.split(" + ")
-        eff_chance_percent = 100 + int(eff_chance_values[0]) * 10
-        return eff_chance_percent
+        if self._eff_chance != "0":
+            eff_chance_values = self._eff_chance.split(" + ")
+            eff_chance_percent = 100 + int(eff_chance_values[0]) * 10
+            return eff_chance_percent
+        else:
+            return 0
 
 
 class RangedWeapon(Item, Weapon):
