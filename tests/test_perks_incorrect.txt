@@ -1,0 +1,30 @@
+# perks #
+
+id:           incorrect_perk
+tags:         speed, test
+name:         Perk
+description:  Test perk.
+effects:      weapon, short, speed, 1
+requirements: attribute, agility, 6
+
+# traits #
+
+id:           incorrect_trait
+tags:         trait, attribute, test
+name:         Trait
+description:  Test trait.
+conflicts:    opposing_trait
+
+# status effects #
+
+id:           incorrect_status_effect
+tags:         status effect, evasion, test
+name:         Status Effect
+description:  Test status effect.
+effects:      evasion, 1
+duration:     none
+
+id:           another_incorrect_status_effect
+tags:         status effect, evasion, test
+name:         Status Effect
+description:  Test status effect.

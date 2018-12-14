@@ -411,7 +411,7 @@ class InventoryWeaponUnloader:
         ammo_to_create_id = weapon_to_unload.ammo_type
         try:
             unloaded_ammo = ItemFactory(data_file).create_item(item_id=ammo_to_create_id)
-        except ItemFactory.BuildError:
+        except ItemFactory.ItemBuildError:
             raise Inventory.InventoryError("incorrect item ID for ammo: {}".format(ammo_to_create_id))
         else:
             unloaded_ammo.current_amount = amount_of_ammo_in_clip

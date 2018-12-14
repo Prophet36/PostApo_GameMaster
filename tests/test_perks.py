@@ -111,47 +111,62 @@ class PlayerTraitTests(unittest.TestCase):
 class StatusEffectTests(unittest.TestCase):
 
     def setUp(self):
-        self.status_effect = StatusEffect(perk_id="status_effect", tags="status effect, attribute, test",
-                                          name="Status Effect", desc="Test status effect.",
-                                          effects="attribute, strength, 1", duration=1)
+        self.status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test",
+                                          name="Status Effect", desc="Test status effect.", effects="evasion, 1",
+                                          duration=1)
 
     def test_property_values(self):
         self.assertEqual("status_effect", self.status_effect.perk_id)
-        self.assertEqual("status effect, attribute, test", self.status_effect.tags)
+        self.assertEqual("status effect, evasion, test", self.status_effect.tags)
         self.assertEqual("Status Effect", self.status_effect.name)
         self.assertEqual("Test status effect.", self.status_effect.desc)
-        self.assertEqual("attribute, strength, 1", self.status_effect.effects)
+        self.assertEqual("evasion, 1", self.status_effect.effects)
         self.assertEqual(1, self.status_effect.duration)
 
     def test_effects_list_with_multiple_effects(self):
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, attribute, test",
-                                     name="Status Effect", desc="Test perk.",
-                                     effects="attribute, strength, 1; attribute, endurance, 1",
-                                     duration=1)
-        correct_effects_list = ["attribute, strength, 1", "attribute, endurance, 1"]
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1; speed, -1", duration=1)
+        correct_effects_list = ["evasion, 1", "speed, -1"]
         effects_list = status_effect.get_effects_list()
         self.assertListEqual(correct_effects_list, effects_list)
 
     def test_effects_list_with_single_effect(self):
-        correct_effects_list = ["attribute, strength, 1"]
+        correct_effects_list = ["evasion, 1"]
         effects_list = self.status_effect.get_effects_list()
         self.assertListEqual(correct_effects_list, effects_list)
 
+    def test_lower_duration(self):
+        self.assertEqual(1, self.status_effect.duration)
+        self.status_effect.lower_duration()
+        self.assertEqual(0, self.status_effect.duration)
+
+    def test_lower_duration_to_zero_does_not_lower_it_further(self):
+        self.assertEqual(1, self.status_effect.duration)
+        self.status_effect.lower_duration()
+        self.assertEqual(0, self.status_effect.duration)
+        self.status_effect.lower_duration()
+        self.assertEqual(0, self.status_effect.duration)
+
+    def test_lower_negative_duration_does_not_lower_it_further(self):
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1", duration=-1)
+        self.assertEqual(-1, status_effect.duration)
+        self.status_effect.lower_duration()
+        self.assertEqual(-1, status_effect.duration)
+
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: status_effect, tags: status effect, attribute, test, name: Status Effect, "
-                             "description: Test status effect., effect: attribute, strength, 1, duration: 1 turn")
+        correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
+                             "description: Test status effect., effect: evasion, 1, duration: 1 turn")
         self.assertEqual(correct_str_print, self.status_effect.__str__())
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, attribute, test",
-                                     name="Status Effect", desc="Test status effect.", effects="attribute, strength, 1",
-                                     duration=2)
-        correct_str_print = ("ID: status_effect, tags: status effect, attribute, test, name: Status Effect, "
-                             "description: Test status effect., effect: attribute, strength, 1, duration: 2 turns")
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1; speed, -1", duration=2)
+        correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
+                             "description: Test status effect., effects: evasion, 1; speed, -1, duration: 2 turns")
         self.assertEqual(correct_str_print, status_effect.__str__())
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, attribute, test",
-                                     name="Status Effect", desc="Test status effect.", effects="attribute, strength, 1",
-                                     duration=-1)
-        correct_str_print = ("ID: status_effect, tags: status effect, attribute, test, name: Status Effect, "
-                             "description: Test status effect., effect: attribute, strength, 1, duration: permanent")
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1", duration=-1)
+        correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
+                             "description: Test status effect., effect: evasion, 1, duration: permanent")
         self.assertEqual(correct_str_print, status_effect.__str__())
 
 

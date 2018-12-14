@@ -215,3 +215,8 @@ class StatusEffect(Perk):
         :return: status effect's duration
         """
         return self._duration
+
+    def lower_duration(self):
+        """Lowers current status effect duration by 1, unless duration is already 0 or lower."""
+        if self._duration > 0:
+            self._duration -= 1

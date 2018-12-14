@@ -9,11 +9,11 @@ from app.items.weapons import MeleeWeapon, RangedWeapon
 class ItemFactoryTests(unittest.TestCase):
 
     def test_invalid_item_data_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "item data is unavailable"):
+        with self.assertRaisesRegex(ItemFactory.ItemBuildError, "item data is unavailable"):
             ItemFactory(data_file="invalid_file.txt")
 
     def test_create_armor(self):
-        armor = ItemFactory(data_file="test_items_correct.txt").create_item("armor")
+        armor = ItemFactory(data_file="test_items_correct.txt").create_item(item_id="armor")
         self.assertIsInstance(armor, Armor)
         self.assertEqual("armor", armor.item_id)
         self.assertEqual("armor, test", armor.tags)
@@ -26,7 +26,7 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual(2.5, armor.weight)
 
     def test_create_melee_weapon(self):
-        weapon = ItemFactory(data_file="test_items_correct.txt").create_item("melee")
+        weapon = ItemFactory(data_file="test_items_correct.txt").create_item(item_id="melee")
         self.assertIsInstance(weapon, MeleeWeapon)
         self.assertEqual("melee", weapon.item_id)
         self.assertEqual("weapon, melee, sharp, test", weapon.tags)
@@ -43,7 +43,7 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual(1.0, weapon.weight)
 
     def test_create_ranged_weapon(self):
-        weapon = ItemFactory(data_file="test_items_correct.txt").create_item("gun")
+        weapon = ItemFactory(data_file="test_items_correct.txt").create_item(item_id="gun")
         self.assertIsInstance(weapon, RangedWeapon)
         self.assertEqual("gun", weapon.item_id)
         self.assertEqual("weapon, gun, short, test", weapon.tags)
@@ -61,7 +61,7 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual(2.0, weapon.weight)
 
     def test_create_ammo(self):
-        ammo = ItemFactory(data_file="test_items_correct.txt").create_item("ammo")
+        ammo = ItemFactory(data_file="test_items_correct.txt").create_item(item_id="ammo")
         self.assertIsInstance(ammo, Ammo)
         self.assertEqual("ammo", ammo.item_id)
         self.assertEqual("ammo, stackable, test", ammo.tags)
@@ -73,7 +73,7 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual(0.01, ammo.weight)
 
     def test_create_consumable(self):
-        consumable = ItemFactory(data_file="test_items_correct.txt").create_item("consumable")
+        consumable = ItemFactory(data_file="test_items_correct.txt").create_item(item_id="consumable")
         self.assertIsInstance(consumable, Consumable)
         self.assertEqual("consumable", consumable.item_id)
         self.assertEqual("consumable, stackable, test", consumable.tags)
@@ -86,20 +86,24 @@ class ItemFactoryTests(unittest.TestCase):
         self.assertEqual(0.5, consumable.weight)
 
     def test_invalid_item_id_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "incorrect item ID"):
-            ItemFactory(data_file="test_items_correct.txt").create_item("invalid_id")
+        with self.assertRaisesRegex(ItemFactory.ItemBuildError, "incorrect item ID"):
+            ItemFactory(data_file="test_items_correct.txt").create_item(item_id="invalid_id")
+
+    def test_incorrect_item_type_raises_exception(self):
+        with self.assertRaisesRegex(ItemFactory.ItemBuildError, "incorrect item type for item: .*"):
+            ItemFactory(data_file="test_items_incorrect.txt").create_item(item_id="incorrect_armor")
 
     def test_incorrect_item_data_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "incorrect parameter data for item: .*"):
-            ItemFactory(data_file="test_items_incorrect.txt").create_item("incorrect_armor")
+        with self.assertRaisesRegex(ItemFactory.ItemBuildError, "incorrect parameter data for item: .*"):
+            ItemFactory(data_file="test_items_incorrect.txt").create_item(item_id="incorrect_melee")
 
     def test_missing_item_data_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "incorrect parameter name: .* for item: .*"):
-            ItemFactory(data_file="test_items_incorrect.txt").create_item("incorrect_melee")
+        with self.assertRaisesRegex(ItemFactory.ItemBuildError, "incorrect parameter name: .* for item: .*"):
+            ItemFactory(data_file="test_items_incorrect.txt").create_item(item_id="incorrect_gun")
 
     def test_missing_item_data_due_to_end_of_file_raises_exception(self):
-        with self.assertRaisesRegex(ItemFactory.BuildError, "missing item data for item: .*"):
-            ItemFactory(data_file="test_items_incorrect.txt").create_item("incorrect_gun")
+        with self.assertRaisesRegex(ItemFactory.ItemBuildError, "missing item data for item: .*"):
+            ItemFactory(data_file="test_items_incorrect.txt").create_item(item_id="incorrect_laser")
 
 
 if __name__ == "__main__":

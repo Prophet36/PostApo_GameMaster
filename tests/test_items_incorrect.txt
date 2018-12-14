@@ -1,12 +1,12 @@
 # armor #
 
 id:                    incorrect_armor
-tags:                  armor, test
+tags:                  test
 name:                  Armor
 description:           Test armor.
-damage_resistance:     none
+damage_resistance:     0
 radiation_resistance:  10
-evasion:               0
+evasion:               2
 value:                 10
 weight:                2.5
 
@@ -19,6 +19,7 @@ description:           Test melee.
 damage:                2 + 4d6
 effect:                bleed_minor
 effect_chance:         -6 + d10
+armor_penetration:     none
 accuracy:              0
 action_points_cost:    10
 strength_requirement:  1
@@ -31,4 +32,19 @@ id:                    incorrect_gun
 tags:                  weapon, gun, short, test
 name:                  Gun
 description:           Test gun.
+damage:                2 + 4d6
+ammo_type:             ammo
+clip_size:             10
+accuracy:              0
+action_points_cost:    10
+strength_requirement:  1
+value:                 10
+weight:                2.0
+
+# weapons - energy
+
+id:                    incorrect_laser
+tags:                  weapon, energy, laser, short, test
+name:                  Laser
+description:           Test laser.
 damage:                2 + 4d6
