@@ -14,33 +14,33 @@ class PerkTests(unittest.TestCase):
 class CharacterPerkTests(unittest.TestCase):
 
     def setUp(self):
-        self.perk = CharacterPerk(perk_id="perk", tags="perk, speed, test", name="Perk", desc="Test perk.",
-                                  effects="weapon, short, speed, 1", requirements="attribute, agility, 6")
+        self.perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+                                  effects="weapon, short, ap_cost, -1", requirements="attribute, agility, 6")
 
     def test_property_values(self):
         self.assertEqual("perk", self.perk.perk_id)
-        self.assertEqual("perk, speed, test", self.perk.tags)
+        self.assertEqual("perk, ap_cost, test", self.perk.tags)
         self.assertEqual("Perk", self.perk.name)
         self.assertEqual("Test perk.", self.perk.desc)
-        self.assertEqual("weapon, short, speed, 1", self.perk.effects)
+        self.assertEqual("weapon, short, ap_cost, -1", self.perk.effects)
         self.assertEqual("attribute, agility, 6", self.perk.requirements)
 
     def test_effects_list_with_multiple_effects(self):
-        perk = CharacterPerk(perk_id="perk", tags="perk, speed, test", name="Perk", desc="Test perk.",
-                             effects="weapon, short, speed, 1; weapon, shotgun, speed, 1",
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+                             effects="weapon, short, ap_cost, -1; weapon, shotgun, ap_cost, -1",
                              requirements="attribute, agility, 6")
-        correct_effects_list = ["weapon, short, speed, 1", "weapon, shotgun, speed, 1"]
+        correct_effects_list = ["weapon, short, ap_cost, -1", "weapon, shotgun, ap_cost, -1"]
         effects_list = perk.get_effects_list()
         self.assertListEqual(correct_effects_list, effects_list)
 
     def test_effects_list_with_single_effect(self):
-        correct_effects_list = ["weapon, short, speed, 1"]
+        correct_effects_list = ["weapon, short, ap_cost, -1"]
         effects_list = self.perk.get_effects_list()
         self.assertListEqual(correct_effects_list, effects_list)
 
     def test_requirements_list_with_multiple_requirements(self):
-        perk = CharacterPerk(perk_id="perk", tags="perk, speed, test", name="Perk", desc="Test perk.",
-                             effects="weapon, short, speed, 1", requirements="level, 2; attribute, agility, 6")
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+                             effects="weapon, short, ap_cost, -1", requirements="level, 2; attribute, agility, 6")
         correct_requirements_list = ["level, 2", "attribute, agility, 6"]
         requirements_list = perk.get_requirements_list()
         self.assertListEqual(correct_requirements_list, requirements_list)
@@ -51,15 +51,15 @@ class CharacterPerkTests(unittest.TestCase):
         self.assertListEqual(correct_requirements_list, requirements_list)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: perk, tags: perk, speed, test, name: Perk, description: Test perk., "
-                             "effect: weapon, short, speed, 1, requirement: attribute, agility, 6")
+        correct_str_print = ("ID: perk, tags: perk, ap_cost, test, name: Perk, description: Test perk., "
+                             "effect: weapon, short, ap_cost, -1, requirement: attribute, agility, 6")
         self.assertEqual(correct_str_print, self.perk.__str__())
-        perk = CharacterPerk(perk_id="perk", tags="perk, speed, test", name="Perk", desc="Test perk.",
-                             effects="weapon, short, speed, 1; weapon, shotgun, speed, 1",
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+                             effects="weapon, short, ap_cost, -1; weapon, shotgun, ap_cost, -1",
                              requirements="level, 2; attribute, agility, 6")
-        correct_str_print = ("ID: perk, tags: perk, speed, test, name: Perk, description: Test perk., "
-                             "effects: weapon, short, speed, 1; weapon, shotgun, speed, 1, requirements: level, 2; "
-                             "attribute, agility, 6")
+        correct_str_print = ("ID: perk, tags: perk, ap_cost, test, name: Perk, description: Test perk., "
+                             "effects: weapon, short, ap_cost, -1; weapon, shotgun, ap_cost, -1, "
+                             "requirements: level, 2; attribute, agility, 6")
         self.assertEqual(correct_str_print, perk.__str__())
 
 
@@ -125,8 +125,8 @@ class StatusEffectTests(unittest.TestCase):
 
     def test_effects_list_with_multiple_effects(self):
         status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
-                                     desc="Test status effect.", effects="evasion, 1; speed, -1", duration=1)
-        correct_effects_list = ["evasion, 1", "speed, -1"]
+                                     desc="Test status effect.", effects="evasion, 1; ap_cost, -1", duration=1)
+        correct_effects_list = ["evasion, 1", "ap_cost, -1"]
         effects_list = status_effect.get_effects_list()
         self.assertListEqual(correct_effects_list, effects_list)
 
@@ -159,9 +159,9 @@ class StatusEffectTests(unittest.TestCase):
                              "description: Test status effect., effect: evasion, 1, duration: 1 turn")
         self.assertEqual(correct_str_print, self.status_effect.__str__())
         status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
-                                     desc="Test status effect.", effects="evasion, 1; speed, -1", duration=2)
+                                     desc="Test status effect.", effects="evasion, 1; ap_cost, -1", duration=2)
         correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
-                             "description: Test status effect., effects: evasion, 1; speed, -1, duration: 2 turns")
+                             "description: Test status effect., effects: evasion, 1; ap_cost, -1, duration: 2 turns")
         self.assertEqual(correct_str_print, status_effect.__str__())
         status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1", duration=-1)

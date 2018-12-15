@@ -14,10 +14,10 @@ class PerkFactoryTests(unittest.TestCase):
         perk = PerkFactory(data_file="test_perks_correct.txt").create_perk("perk")
         self.assertIsInstance(perk, CharacterPerk)
         self.assertEqual("perk", perk.perk_id)
-        self.assertEqual("perk, speed, test", perk.tags)
+        self.assertEqual("perk, ap_cost, test", perk.tags)
         self.assertEqual("Perk", perk.name)
         self.assertEqual("Test perk.", perk.desc)
-        self.assertEqual("weapon, short, speed, 1", perk.effects)
+        self.assertEqual("weapon, short, ap_cost, -1", perk.effects)
         self.assertEqual("attribute, agility, 6", perk.requirements)
 
     def test_create_player_trait(self):

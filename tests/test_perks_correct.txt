@@ -1,10 +1,10 @@
 # perks #
 
 id:           perk
-tags:         perk, speed, test
+tags:         perk, ap_cost, test
 name:         Perk
 description:  Test perk.
-effects:      weapon, short, speed, 1
+effects:      weapon, short, ap_cost, -1
 requirements: attribute, agility, 6
 
 # traits #

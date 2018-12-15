@@ -27,9 +27,9 @@ class InventoryTests(unittest.TestCase):
 
     def test_create_inventory_instance_with_incorrect_obj_types_for_equipped_items_raises_exception(self):
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object .* to create inventory with"):
-            Inventory(armor="not Armor class object", weapon=self.weapon)
+            Inventory(armor="not Armor object", weapon=self.weapon)
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object .* to create inventory with"):
-            Inventory(armor=self.armor, weapon="not Weapon derived class object")
+            Inventory(armor=self.armor, weapon="not Weapon derived object")
 
     def test_obj_as_str_representation(self):
         correct_str_print = "Armor: Armor\nWeapon: Gun\nItems:\nNone"
@@ -94,13 +94,23 @@ class InventoryItemAdderTests(unittest.TestCase):
         self.assertEqual(10, self.inventory.items[1].current_amount)
 
     def test_add_incorrect_obj_as_item_raises_exception(self):
-        item_to_add = "not Item derived class object"
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type to add to inventory"):
-            InventoryItemAdder.add_item(inv=self.inventory, item_to_add=item_to_add)
+            InventoryItemAdder.add_item(inv=self.inventory, item_to_add="not Item derived object")
 
     def test_incorrect_obj_as_inventory_raises_exception(self):
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type for inventory"):
             InventoryItemAdder.add_item(inv="not Inventory object", item_to_add="item to add")
+
+    def test_inventory_with_multiple_items_as_str_representation(self):
+        ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.", max_stack=50,
+                    current_amount=30, value=1, weight=0.01)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Pistol", desc="Test pistol.",
+                              damage="2 + 4d6", armor_pen=0, accuracy=0, ammo_type="ammo", clip_size=10, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=ammo)
+        InventoryItemAdder.add_item(inv=self.inventory, item_to_add=weapon)
+        correct_str_print = "Armor: Armor\nWeapon: Gun\nItems:\n1: Ammo\n2: Pistol"
+        self.assertEqual(correct_str_print, self.inventory.__str__())
 
 
 class InventoryItemRemoverTests(unittest.TestCase):

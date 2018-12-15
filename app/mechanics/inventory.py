@@ -34,6 +34,15 @@ class Inventory:
             raise Inventory.InventoryError("incorrect object type(s) to create inventory with")
         self._items = list()
 
+    def __str__(self):
+        str_print = "Armor: {}\nWeapon: {}\nItems:".format(self._equipped_armor.name, self._equipped_weapon.name)
+        if len(self._items) > 0:
+            for idx, item in enumerate(self._items):
+                str_print += "\n{}: {}".format(idx + 1, item.name)
+        else:
+            str_print += "\nNone"
+        return str_print
+
     @property
     def equipped_armor(self):
         """Gets equipped armor as Armor object.
@@ -81,16 +90,6 @@ class Inventory:
         :return: list of Item derived objects representing carried items
         """
         return self._items
-
-    def __str__(self):
-        str_representation = "Armor: {}\nWeapon: {}\nItems:".format(self._equipped_armor.name,
-                                                                    self._equipped_weapon.name)
-        if len(self._items) > 0:
-            for idx, item in enumerate(self._items):
-                str_representation += "\n{}: {}".format(idx + 1, item.name)
-        else:
-            str_representation += "\nNone"
-        return str_representation
 
 
 class InventoryItemAdder:
