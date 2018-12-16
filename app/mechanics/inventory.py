@@ -1,7 +1,7 @@
 from app.items.items import Item, Armor
 from app.items.factory import ItemFactory
 from app.items.stackables import Stackable, Ammo
-from app.items.weapons import Weapon, MeleeWeapon, RangedWeapon
+from app.items.weapons import Weapon, RangedWeapon
 from app.config.game_config import get_default_armor, get_default_weapon
 
 
@@ -18,24 +18,37 @@ class Inventory:
         """This exception class exist to unify all errors and exceptions occurring during inventory manipulation."""
         pass
 
-    def __init__(self, armor, weapon):
-        """Initializes instance of the class with provided armor and weapon as default equipped items.
+    def __init__(self, armor=None, weapon=None):
+        """Initializes instance of the class with provided optional armor and weapon as equipped items.
 
         Provided armor and weapon must be Armor and Weapon derived objects, respectively.
 
-        :param armor: Armor object representing equipped weapon
-        :param weapon: Weapon derived object representing equipped weapon
+        :param armor: Armor object representing equipped weapon (defaults to None)
+        :param weapon: Weapon derived object representing equipped weapon (defaults to None)
         :raises InventoryError: when provided armor or weapon object is of incorrect type
         """
-        if isinstance(armor, Armor) and (isinstance(weapon, MeleeWeapon) or isinstance(weapon, RangedWeapon)):
+        if isinstance(armor, Armor) or armor is None:
             self._equipped_armor = armor
+        else:
+            raise Inventory.InventoryError("incorrect object type(s) to create inventory with")
+        if isinstance(weapon, Weapon) or weapon is None:
             self._equipped_weapon = weapon
         else:
             raise Inventory.InventoryError("incorrect object type(s) to create inventory with")
         self._items = list()
 
     def __str__(self):
-        str_print = "Armor: {}\nWeapon: {}\nItems:".format(self._equipped_armor.name, self._equipped_weapon.name)
+        str_print = "Armor: "
+        if isinstance(self._equipped_armor, Item):
+            str_print += self._equipped_armor.name
+        else:
+            str_print += "None"
+        str_print += "\nWeapon: "
+        if isinstance(self._equipped_weapon, Item):
+            str_print += self._equipped_weapon.name
+        else:
+            str_print += "None"
+        str_print += "\nItems:"
         if len(self._items) > 0:
             for idx, item in enumerate(self._items):
                 str_print += "\n{}: {}".format(idx + 1, item.name)

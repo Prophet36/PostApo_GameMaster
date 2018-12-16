@@ -97,7 +97,7 @@ class Armor(Item):
         self._evasion = evasion
 
     def __str__(self):
-        return ("ID: {}, tags: {}, name: {}, description: {}, damage resistance: {}, radiation resistance: {}, "
+        return ("ID: {}, tags: {}, name: {}, description: {},\ndamage resistance: {}, radiation resistance: {}, "
                 "evasion: {}, value: {}, weight: {}"
                 .format(self._item_id, self._tags, self._name, self._desc, self._dmg_res, self._rad_res, self._evasion,
                         self._value, self._weight))

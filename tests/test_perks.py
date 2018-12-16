@@ -51,13 +51,13 @@ class CharacterPerkTests(unittest.TestCase):
         self.assertListEqual(correct_requirements_list, requirements_list)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: perk, tags: perk, ap_cost, test, name: Perk, description: Test perk., "
+        correct_str_print = ("ID: perk, tags: perk, ap_cost, test, name: Perk, description: Test perk.,\n"
                              "effect: weapon, short, ap_cost, -1, requirement: attribute, agility, 6")
         self.assertEqual(correct_str_print, self.perk.__str__())
         perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
                              effects="weapon, short, ap_cost, -1; weapon, shotgun, ap_cost, -1",
                              requirements="level, 2; attribute, agility, 6")
-        correct_str_print = ("ID: perk, tags: perk, ap_cost, test, name: Perk, description: Test perk., "
+        correct_str_print = ("ID: perk, tags: perk, ap_cost, test, name: Perk, description: Test perk.,\n"
                              "effects: weapon, short, ap_cost, -1; weapon, shotgun, ap_cost, -1, "
                              "requirements: level, 2; attribute, agility, 6")
         self.assertEqual(correct_str_print, perk.__str__())
@@ -96,13 +96,13 @@ class PlayerTraitTests(unittest.TestCase):
         self.assertListEqual(correct_conflicts_list, conflicts_list)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: trait, tags: trait, attribute, test, name: Trait, description: Test trait., "
+        correct_str_print = ("ID: trait, tags: trait, attribute, test, name: Trait, description: Test trait.,\n"
                              "effects: attribute, strength, -1; attribute, agility, 1, conflict: opposing_trait")
         self.assertEqual(correct_str_print, self.trait.__str__())
         trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
                             effects="attribute, strength, -1; attribute, agility, 1",
                             conflicts="opposing_trait, another_opposing_trait")
-        correct_str_print = ("ID: trait, tags: trait, attribute, test, name: Trait, description: Test trait., "
+        correct_str_print = ("ID: trait, tags: trait, attribute, test, name: Trait, description: Test trait.,\n"
                              "effects: attribute, strength, -1; attribute, agility, 1, conflicts: opposing_trait, "
                              "another_opposing_trait")
         self.assertEqual(correct_str_print, trait.__str__())
@@ -156,17 +156,17 @@ class StatusEffectTests(unittest.TestCase):
 
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
-                             "description: Test status effect., effect: evasion, 1, duration: 1 turn")
+                             "description: Test status effect.,\neffect: evasion, 1, duration: 1 turn")
         self.assertEqual(correct_str_print, self.status_effect.__str__())
         status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1; ap_cost, -1", duration=2)
         correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
-                             "description: Test status effect., effects: evasion, 1; ap_cost, -1, duration: 2 turns")
+                             "description: Test status effect.,\neffects: evasion, 1; ap_cost, -1, duration: 2 turns")
         self.assertEqual(correct_str_print, status_effect.__str__())
         status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1", duration=-1)
         correct_str_print = ("ID: status_effect, tags: status effect, evasion, test, name: Status Effect, "
-                             "description: Test status effect., effect: evasion, 1, duration: permanent")
+                             "description: Test status effect.,\neffect: evasion, 1, duration: permanent")
         self.assertEqual(correct_str_print, status_effect.__str__())
 
 

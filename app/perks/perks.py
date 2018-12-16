@@ -92,8 +92,8 @@ class CharacterPerk(Perk):
         self._requirements = requirements
 
     def __str__(self):
-        str_print = "ID: {}, tags: {}, name: {}, description: {}, ".format(self._perk_id, self._tags, self._name,
-                                                                           self._desc)
+        str_print = "ID: {}, tags: {}, name: {}, description: {},\n".format(self._perk_id, self._tags, self._name,
+                                                                            self._desc)
         if len(self.get_effects_list()) == 1:
             str_print += "effect: {}, ".format(self._effects)
         else:
@@ -142,8 +142,8 @@ class PlayerTrait(Perk):
         self._conflicts = conflicts
 
     def __str__(self):
-        str_print = "ID: {}, tags: {}, name: {}, description: {}, ".format(self._perk_id, self._tags, self._name,
-                                                                           self._desc)
+        str_print = "ID: {}, tags: {}, name: {}, description: {},\n".format(self._perk_id, self._tags, self._name,
+                                                                            self._desc)
         if len(self.get_effects_list()) == 1:
             str_print += "effect: {}, ".format(self._effects)
         else:
@@ -192,8 +192,8 @@ class StatusEffect(Perk):
         self._duration = duration
 
     def __str__(self):
-        str_print = "ID: {}, tags: {}, name: {}, description: {}, ".format(self._perk_id, self._tags, self._name,
-                                                                           self._desc)
+        str_print = "ID: {}, tags: {}, name: {}, description: {},\n".format(self._perk_id, self._tags, self._name,
+                                                                            self._desc)
         if len(self.get_effects_list()) == 1:
             str_print += "effect: {}, ".format(self._effects)
         else:

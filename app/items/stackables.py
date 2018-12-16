@@ -72,7 +72,7 @@ class Ammo(Item, Stackable):
     def __str__(self):
         total_value = self._current_amount * self._value
         total_weight = self._current_amount * self._weight
-        return ("ID: {}, tags: {}, name: {}, description: {}, amount: {} / {}, value: {} ({}), weight: {} ({})"
+        return ("ID: {}, tags: {}, name: {}, description: {},\namount: {} / {}, value: {} ({}), weight: {} ({})"
                 .format(self._item_id, self._tags, self._name, self._desc, self._current_amount, self._max_stack,
                         self._value, total_value, self._weight, total_weight))
 
@@ -111,7 +111,7 @@ class Consumable(Item, Stackable):
     def __str__(self):
         total_value = self._current_amount * self._value
         total_weight = self._current_amount * self._weight
-        return ("ID: {}, tags: {}, name: {}, description: {}, effect: {}, amount: {} / {}, value: {} ({}), weight: "
+        return ("ID: {}, tags: {}, name: {}, description: {},\neffect: {}, amount: {} / {}, value: {} ({}), weight: "
                 "{} ({})"
                 .format(self._item_id, self._tags, self._name, self._desc, self._effect, self._current_amount,
                         self._max_stack, self._value, total_value, self._weight, total_weight))

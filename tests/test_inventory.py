@@ -12,28 +12,48 @@ from app.mechanics.inventory import InventoryItemMover
 class InventoryTests(unittest.TestCase):
 
     def setUp(self):
-        self.armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
-                           evasion=2, value=10, weight=2.5)
-        self.weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                                   damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
-                                   ap_cost=10, st_requirement=1, value=10, weight=2.0)
-        self.inventory = Inventory(armor=self.armor, weapon=self.weapon)
+        self.inventory = Inventory()
 
     def test_property_values(self):
         self.assertIsInstance(self.inventory.items, list)
         self.assertEqual(0, len(self.inventory.items))
-        self.assertIs(self.armor, self.inventory.equipped_armor)
-        self.assertIs(self.weapon, self.inventory.equipped_weapon)
+        self.assertIsNone(self.inventory.equipped_armor)
+        self.assertIsNone(self.inventory.equipped_weapon)
 
-    def test_create_inventory_instance_with_incorrect_obj_types_for_equipped_items_raises_exception(self):
+    def test_create_inventory_with_equipped_items(self):
+        armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        inventory = Inventory(armor=armor, weapon=weapon)
+        self.assertIs(armor, inventory.equipped_armor)
+        self.assertIs(weapon, inventory.equipped_weapon)
+
+    def test_create_inventory_with_incorrect_obj_types_for_equipped_items_raises_exception(self):
+        armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object .* to create inventory with"):
-            Inventory(armor="not Armor object", weapon=self.weapon)
+            Inventory(armor="not Armor object", weapon=weapon)
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object .* to create inventory with"):
-            Inventory(armor=self.armor, weapon="not Weapon derived object")
+            Inventory(armor=armor, weapon="not Weapon derived object")
 
     def test_obj_as_str_representation(self):
-        correct_str_print = "Armor: Armor\nWeapon: Gun\nItems:\nNone"
+        correct_str_print = "Armor: None\nWeapon: None\nItems:\nNone"
         self.assertEqual(correct_str_print, self.inventory.__str__())
+
+    def test_inventory_with_equipped_items_as_str_representation_(self):
+        armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+                              damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
+                              st_requirement=1, value=10, weight=2.0)
+        inventory = Inventory(armor=armor, weapon=weapon)
+        correct_str_print = "Armor: Armor\nWeapon: Gun\nItems:\nNone"
+        self.assertEqual(correct_str_print, inventory.__str__())
 
 
 class InventoryItemAdderTests(unittest.TestCase):
