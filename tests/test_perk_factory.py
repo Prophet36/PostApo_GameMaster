@@ -1,7 +1,7 @@
 import unittest
 
 from app.perks.factory import PerkFactory
-from app.perks.generic import CharacterPerk, PlayerTrait, StatusEffect
+from app.perks.perks import CharacterPerk, PlayerTrait, StatusEffect
 
 
 class PerkFactoryTests(unittest.TestCase):

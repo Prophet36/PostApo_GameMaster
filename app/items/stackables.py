@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.items.generic import Item
+from app.items.items import Item
 
 
 class Stackable(ABC):

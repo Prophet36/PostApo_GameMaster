@@ -1,8 +1,8 @@
 import unittest
 
-from app.items.generic import Item, Armor, Weapon
+from app.items.items import Item, Armor
 from app.items.stackables import Stackable, Ammo, Consumable
-from app.items.weapons import MeleeWeapon, RangedWeapon
+from app.items.weapons import Weapon, MeleeWeapon, RangedWeapon
 
 
 class ItemTests(unittest.TestCase):

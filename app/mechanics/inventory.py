@@ -1,7 +1,7 @@
-from app.items.generic import Item, Armor, Weapon
+from app.items.items import Item, Armor
 from app.items.factory import ItemFactory
 from app.items.stackables import Stackable, Ammo
-from app.items.weapons import MeleeWeapon, RangedWeapon
+from app.items.weapons import Weapon, MeleeWeapon, RangedWeapon
 from app.config.game_config import get_default_armor, get_default_weapon
 
 

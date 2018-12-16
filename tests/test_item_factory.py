@@ -1,7 +1,7 @@
 import unittest
 
 from app.items.factory import ItemFactory
-from app.items.generic import Armor
+from app.items.items import Armor
 from app.items.stackables import Ammo, Consumable
 from app.items.weapons import MeleeWeapon, RangedWeapon
 

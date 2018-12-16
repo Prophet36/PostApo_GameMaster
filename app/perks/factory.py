@@ -1,5 +1,5 @@
 from app.files.file_handler import FileHandler
-from app.perks.generic import CharacterPerk, PlayerTrait, StatusEffect
+from app.perks.perks import CharacterPerk, PlayerTrait, StatusEffect
 
 
 class PerkFactory:

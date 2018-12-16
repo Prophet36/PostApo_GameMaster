@@ -1,4 +1,89 @@
-from app.items.generic import Item, Weapon
+from abc import ABC, abstractmethod
+
+from app.items.items import Item
+
+
+class Weapon(ABC):
+    """This is abstract base class representing weapons existing in the game and contains necessary and common
+    parameters and methods for all weapons.
+    """
+
+    @abstractmethod
+    def __init__(self, damage, armor_pen, accuracy, ap_cost, st_requirement):
+        """Initializes object instance with specified parameters.
+
+        :param damage: damage dealt by weapon; formatted as A + XdY, where A is base damage, X is number of Y-sided dice
+                       rolls (A is omitted when it would be 0, while X is omitted when it would be 1)
+        :param armor_pen: armor penetration
+        :param accuracy: bonus (or malus, if negative) to accuracy
+        :param ap_cost: action points cost of attack using the weapon
+        :param st_requirement: strength required to use the weapon
+        """
+        self._damage = damage
+        self._armor_pen = armor_pen
+        self._accuracy = accuracy
+        self._ap_cost = ap_cost
+        self._st_requirement = st_requirement
+
+    @property
+    def damage(self):
+        """Gets weapon's damage formula.
+
+        :return: damage formula
+        """
+        return self._damage
+
+    @property
+    def armor_pen(self):
+        """Gets weapon's armor penetration.
+
+        :return: armor penetration
+        """
+        return self._armor_pen
+
+    @property
+    def accuracy(self):
+        """Gets weapon's bonus (malus) to accuracy.
+
+        :return: bonus (malus) to accuracy
+        """
+        return self._accuracy
+
+    @property
+    def ap_cost(self):
+        """Gets weapon's attack action points cost.
+
+        :return: action points cost of attack
+        """
+        return self._ap_cost
+
+    @property
+    def st_requirement(self):
+        """Gets weapon's strength requirement.
+
+        :return: strength requirement
+        """
+        return self._st_requirement
+
+    def get_dmg_range(self):
+        """Calculates and returns weapon's minimum and maximum damage range.
+
+        :return: damage range as tuple of minimum and maximum damage
+        """
+        dmg_values = self._damage.split(" + ")
+        if len(dmg_values) == 2:
+            base_dmg = int(dmg_values[0])
+            roll_dmg = dmg_values[1]
+        else:
+            base_dmg = 0
+            roll_dmg = dmg_values[0]
+        roll_dmg_values = roll_dmg.split("d")
+        if roll_dmg_values[0] == "":
+            roll_dmg_values[0] = 1
+        roll_dmg_values = [int(x) for x in roll_dmg_values]
+        min_dmg = base_dmg + roll_dmg_values[0]
+        max_dmg = base_dmg + roll_dmg_values[0] * roll_dmg_values[1]
+        return min_dmg, max_dmg
 
 
 class MeleeWeapon(Item, Weapon):
