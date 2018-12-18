@@ -1,0 +1,31 @@
+# critters #
+
+id:           critter
+tags:         critter, test
+name:         Critter
+level:        1
+strength:     5
+endurance:    5
+agility:      5
+perception:   5
+intelligence: 5
+health_bonus: 10
+exp_award:    10
+armor:        armor
+weapon:       melee
+perks:        perk, trait, status_effect
+
+id:           another_critter
+tags:         critter, test
+name:         Critter
+level:        1
+strength:     5
+endurance:    5
+agility:      5
+perception:   5
+intelligence: 5
+health_bonus: 10
+exp_award:    10
+armor:        armor
+weapon:       melee
+perks:        none

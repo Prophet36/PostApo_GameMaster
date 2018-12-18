@@ -45,7 +45,7 @@ class PerkFactory:
         :return: Perk derived object
         """
         for idx, line in enumerate(self._data):
-            if "id:" in line and perk_id in line:
+            if "id:" in line and line.split()[-1] == perk_id:
                 self._line_number_containing_perk_id = idx
                 self._perk_id_to_find = perk_id
                 return self._create_found_perk()

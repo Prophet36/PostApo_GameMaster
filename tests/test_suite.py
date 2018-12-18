@@ -1,6 +1,7 @@
 import unittest
 
 import tests.test_characters
+import tests.test_critter_factory
 import tests.test_file_handler
 import tests.test_inventory
 import tests.test_item_factory
@@ -13,6 +14,7 @@ loader = unittest.TestLoader()
 
 suite = unittest.TestSuite()
 suite.addTests(loader.loadTestsFromModule(tests.test_characters))
+suite.addTests(loader.loadTestsFromModule(tests.test_critter_factory))
 suite.addTests(loader.loadTestsFromModule(tests.test_file_handler))
 suite.addTests(loader.loadTestsFromModule(tests.test_inventory))
 suite.addTests(loader.loadTestsFromModule(tests.test_item_factory))

@@ -47,7 +47,7 @@ class ItemFactory:
         :return: Item derived object
         """
         for idx, line in enumerate(self._data):
-            if "id:" in line and item_id in line:
+            if "id:" in line and line.split()[-1] == item_id:
                 self._line_number_containing_item_id = idx
                 self._item_id_to_find = item_id
                 return self._create_found_item()

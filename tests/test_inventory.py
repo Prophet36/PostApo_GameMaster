@@ -199,6 +199,28 @@ class InventoryItemEquipperTests(unittest.TestCase):
         self.assertIs(self.equippable_weapon, self.inventory.equipped_weapon)
         self.assertIs(self.weapon, self.inventory.items[1])
 
+    def equip_armor_in_empty_slot(self):
+        inventory = Inventory()
+        self.assertEqual(0, len(inventory.items))
+        item_to_add = self.equippable_armor
+        self.assertEqual(1, len(inventory.items))
+        InventoryItemAdder.add_item(inv=inventory, item_to_add=item_to_add)
+        item_to_equip = inventory.items[0]
+        InventoryItemEquipper.equip_item(inv=inventory, item_to_equip=item_to_equip)
+        self.assertIs(self.equippable_armor, self.inventory.equipped_armor)
+        self.assertEqual(0, len(inventory.items))
+
+    def equip_weapon_in_empty_slot(self):
+        inventory = Inventory()
+        self.assertEqual(0, len(inventory.items))
+        item_to_add = self.equippable_weapon
+        self.assertEqual(1, len(inventory.items))
+        InventoryItemAdder.add_item(inv=inventory, item_to_add=item_to_add)
+        item_to_equip = inventory.items[0]
+        InventoryItemEquipper.equip_item(inv=inventory, item_to_equip=item_to_equip)
+        self.assertIs(self.equippable_weapon, self.inventory.equipped_weapon)
+        self.assertEqual(0, len(inventory.items))
+
     def test_equip_incorrect_item_type_raises_exception(self):
         item_to_equip = self.inventory.items[2]
         with self.assertRaisesRegex(Inventory.InventoryError, "incorrect object type to equip"):

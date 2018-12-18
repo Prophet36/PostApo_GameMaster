@@ -288,7 +288,7 @@ class Critter(Character):
     """
 
     def __init__(self, name, tags, level, strength, endurance, agility, perception, intelligence, health_bonus,
-                 xp_award):
+                 exp_award):
         """Initializes object instance with specified parameters.
 
         :param name: critter's name
@@ -299,11 +299,12 @@ class Critter(Character):
         :param agility: agility attribute
         :param perception: perception attribute
         :param intelligence: intelligence attribute
-        :param xp_award: experience award provided upon killing the critter
+        :param health_bonus: critter's bonus to max health
+        :param exp_award: experience award provided upon killing the critter
         """
         super().__init__(name, tags, level, strength, endurance, agility, perception, intelligence)
         self._health_bonus = health_bonus
-        self._experience_award = xp_award
+        self._experience_award = exp_award
 
     def __str__(self):
         return ("name: {}, tags: {}, level: {},\nstrength: {}, endurance: {}, agility: {}, perception: {}, "

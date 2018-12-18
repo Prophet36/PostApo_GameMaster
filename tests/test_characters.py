@@ -93,7 +93,7 @@ class CritterTests(unittest.TestCase):
 
     def setUp(self):
         self.critter = Critter(name="Critter", tags="critter, test", level=1, strength=5, endurance=5, agility=5,
-                               perception=5, intelligence=5, health_bonus=10, xp_award=10)
+                               perception=5, intelligence=5, health_bonus=10, exp_award=10)
 
     def test_property_values(self):
         self.assertEqual("Critter", self.critter.name)
@@ -104,11 +104,10 @@ class CritterTests(unittest.TestCase):
         self.assertEqual(5, self.critter.agility)
         self.assertEqual(5, self.critter.perception)
         self.assertEqual(5, self.critter.intelligence)
-        self.assertEqual(10, self.critter.health_bonus)
-        self.assertEqual(10, self.critter.experience_award)
         self.assertEqual(0, self.critter.health)
         self.assertEqual(10, self.critter.health_bonus)
         self.assertEqual(0, self.critter.action_points)
+        self.assertEqual(10, self.critter.experience_award)
         self.assertIsInstance(self.critter.inventory, Inventory)
         self.assertIsInstance(self.critter.perks, PerkInventory)
 

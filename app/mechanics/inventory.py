@@ -237,6 +237,8 @@ class InventoryItemEquipper:
         else:
             idx = inv.items.index(armor_to_equip)
             inv.items[idx], inv.equipped_armor = inv.equipped_armor, inv.items[idx]
+            if inv.items[idx] is None:
+                inv.items.pop(idx)
 
     @staticmethod
     def _equip_weapon(inv, weapon_to_equip):
@@ -253,6 +255,8 @@ class InventoryItemEquipper:
         else:
             idx = inv.items.index(weapon_to_equip)
             inv.items[idx], inv.equipped_weapon = inv.equipped_weapon, inv.items[idx]
+            if inv.items[idx] is None:
+                inv.items.pop(idx)
 
 
 class InventoryItemUnequipper:
