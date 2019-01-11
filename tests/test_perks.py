@@ -67,7 +67,8 @@ class PlayerTraitTests(unittest.TestCase):
 
     def setUp(self):
         self.trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
-                                 effects="attribute, strength, -1; attribute, agility, 1", conflicts="opposing_trait")
+                                 effects="attribute, strength, -1; attribute, agility, 1",
+                                 conflicts="conflicting_trait")
 
     def test_property_values(self):
         self.assertEqual("trait", self.trait.perk_id)
@@ -75,7 +76,7 @@ class PlayerTraitTests(unittest.TestCase):
         self.assertEqual("Trait", self.trait.name)
         self.assertEqual("Test trait.", self.trait.desc)
         self.assertEqual("attribute, strength, -1; attribute, agility, 1", self.trait.effects)
-        self.assertEqual("opposing_trait", self.trait.conflicts)
+        self.assertEqual("conflicting_trait", self.trait.conflicts)
 
     def test_effects_list(self):
         correct_effects_list = ["attribute, strength, -1", "attribute, agility, 1"]
@@ -85,26 +86,26 @@ class PlayerTraitTests(unittest.TestCase):
     def test_conflicts_list_with_multiple_conflicts(self):
         trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
                             effects="attribute, strength, -1, attribute, agility, 1",
-                            conflicts="opposing_trait, another_opposing_trait")
-        correct_conflicts_list = ["opposing_trait", "another_opposing_trait"]
+                            conflicts="conflicting_trait, another_conflicting_trait")
+        correct_conflicts_list = ["conflicting_trait", "another_conflicting_trait"]
         conflicts_list = trait.get_conflicts_list()
         self.assertListEqual(correct_conflicts_list, conflicts_list)
 
     def test_conflicts_list_with_single_conflict(self):
-        correct_conflicts_list = ["opposing_trait"]
+        correct_conflicts_list = ["conflicting_trait"]
         conflicts_list = self.trait.get_conflicts_list()
         self.assertListEqual(correct_conflicts_list, conflicts_list)
 
     def test_obj_as_str_representation(self):
         correct_str_print = ("ID: trait, tags: trait, attribute, test, name: Trait, description: Test trait.,\n"
-                             "effects: attribute, strength, -1; attribute, agility, 1, conflict: opposing_trait")
+                             "effects: attribute, strength, -1; attribute, agility, 1, conflict: conflicting_trait")
         self.assertEqual(correct_str_print, self.trait.__str__())
         trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
                             effects="attribute, strength, -1; attribute, agility, 1",
-                            conflicts="opposing_trait, another_opposing_trait")
+                            conflicts="conflicting_trait, another_conflicting_trait")
         correct_str_print = ("ID: trait, tags: trait, attribute, test, name: Trait, description: Test trait.,\n"
-                             "effects: attribute, strength, -1; attribute, agility, 1, conflicts: opposing_trait, "
-                             "another_opposing_trait")
+                             "effects: attribute, strength, -1; attribute, agility, 1, conflicts: conflicting_trait, "
+                             "another_conflicting_trait")
         self.assertEqual(correct_str_print, trait.__str__())
 
 

@@ -9,6 +9,7 @@ import tests.test_items
 import tests.test_perk_factory
 import tests.test_perk_inventory
 import tests.test_perks
+import tests.test_stat_calculators
 
 loader = unittest.TestLoader()
 
@@ -22,7 +23,7 @@ suite.addTests(loader.loadTestsFromModule(tests.test_items))
 suite.addTests(loader.loadTestsFromModule(tests.test_perk_factory))
 suite.addTests(loader.loadTestsFromModule(tests.test_perk_inventory))
 suite.addTests(loader.loadTestsFromModule(tests.test_perks))
-
+suite.addTests(loader.loadTestsFromModule(tests.test_stat_calculators))
 
 if __name__ == "__main__":
     runner = unittest.TextTestRunner()

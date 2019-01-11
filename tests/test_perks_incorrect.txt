@@ -13,7 +13,7 @@ id:           incorrect_trait
 tags:         trait, attribute, test
 name:         Trait
 description:  Test trait.
-conflicts:    opposing_trait
+conflicts:    conflicting_trait
 
 # status effects #
 

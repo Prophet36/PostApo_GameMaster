@@ -28,7 +28,7 @@ class PerkFactoryTests(unittest.TestCase):
         self.assertEqual("Trait", trait.name)
         self.assertEqual("Test trait.", trait.desc)
         self.assertEqual("attribute, strength, -1; attribute, agility, 1", trait.effects)
-        self.assertEqual("opposing_trait", trait.conflicts)
+        self.assertEqual("conflicting_trait", trait.conflicts)
 
     def test_create_status_effect(self):
         status_effect = PerkFactory(data_file="test_perks_correct.txt").create_perk("status_effect")

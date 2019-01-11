@@ -14,7 +14,7 @@ tags:         trait, attribute, test
 name:         Trait
 description:  Test trait.
 effects:      attribute, strength, -1; attribute, agility, 1
-conflicts:    opposing_trait
+conflicts:    conflicting_trait
 
 # status effects #
 

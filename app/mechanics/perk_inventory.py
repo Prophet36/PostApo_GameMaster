@@ -1,4 +1,4 @@
-from app.perks.perks import Perk, StatusEffect
+from app.perks.perks import Perk, PlayerTrait, StatusEffect
 
 
 class PerkInventory:
@@ -51,11 +51,11 @@ class PerkInventoryPerkAdder:
         :raises PerkInventoryError: when specified perk inventory or perk is incorrect
         """
         if not isinstance(perk_inv, PerkInventory):
-            raise PerkInventory.PerkInventoryError("incorrect object type for perk list")
+            raise PerkInventory.PerkInventoryError("incorrect object type for perk inventory")
         if isinstance(perk_to_add, Perk):
             PerkInventoryPerkAdder._add_perk(perk_inv=perk_inv, perk_to_add=perk_to_add)
         else:
-            raise PerkInventory.PerkInventoryError("incorrect object type to add to perk list")
+            raise PerkInventory.PerkInventoryError("incorrect object type to add to perk inventory")
 
     @staticmethod
     def _add_perk(perk_inv, perk_to_add):
@@ -65,11 +65,27 @@ class PerkInventoryPerkAdder:
         :param perk_to_add: Perk derived object to add to perk inventory
         :raises PerkInventoryError: when adding already existing perk
         """
+        if isinstance(perk_to_add, PlayerTrait):
+            PerkInventoryPerkAdder._check_conflicting_traits(perk_inv=perk_inv, trait_to_add=perk_to_add)
         for perk in perk_inv.perks:
             if perk.perk_id == perk_to_add.perk_id:
                 raise PerkInventory.PerkInventoryError("can't add already existing perk: {}".format(perk_to_add.name))
         else:
             perk_inv.perks.append(perk_to_add)
+
+    @staticmethod
+    def _check_conflicting_traits(perk_inv, trait_to_add):
+        """Checks for conflicting traits already existing in a list of active perks.
+
+        :param perk_inv: PerkInventory object to check trait conflicts in
+        :param trait_to_add: PlayerTrait object to check conflicts for
+        :raises PerkInventoryError: when conflicting trait exist in a list of active perks
+        """
+        conflicting_traits = trait_to_add.get_conflicts_list()
+        for perk in perk_inv.perks:
+            if perk.perk_id in conflicting_traits:
+                raise PerkInventory.PerkInventoryError("can't add conflicting trait: {} for trait: {}"
+                                                       .format(trait_to_add.name, perk.name))
 
 
 class PerkInventoryPerkRemover:
@@ -88,17 +104,17 @@ class PerkInventoryPerkRemover:
         :raises PerkInventoryError: when specified perk inventory or perk is incorrect
         """
         if not isinstance(perk_inv, PerkInventory):
-            raise PerkInventory.PerkInventoryError("incorrect object type for perk list")
+            raise PerkInventory.PerkInventoryError("incorrect object type for perk inventory")
         try:
             perk_inv.perks.remove(perk_to_remove)
         except ValueError:
-            raise PerkInventory.PerkInventoryError("no such perk in perk list")
+            raise PerkInventory.PerkInventoryError("no such perk in perk inventory")
 
 
 class PerkInventoryStatusEffectDurationLowerer:
     """This class lowers duration of all status effects in specified perk inventory.
 
-    The class uses PerkInventory class' PerkInventoryError exception, which is raised when specified perk list is
+    The class uses PerkInventory class' PerkInventoryError exception, which is raised when specified perk inventory is
     incorrect.
     """
 
@@ -110,7 +126,7 @@ class PerkInventoryStatusEffectDurationLowerer:
         :raises PerkInventoryError: when specified perk inventory is incorrect
         """
         if not isinstance(perk_inv, PerkInventory):
-            raise PerkInventory.PerkInventoryError("incorrect object type for perk list")
+            raise PerkInventory.PerkInventoryError("incorrect object type for perk inventory")
         for perk in perk_inv.perks:
             if isinstance(perk, StatusEffect):
                 perk.lower_duration()
