@@ -3,7 +3,7 @@ import unittest
 from app.characters.characters import Human
 from app.mechanics.perk_inventory import PerkInventoryPerkAdder
 from app.mechanics.stat_calculators import PerkAttributeCalculator, PerkSkillCalculator, PerkDerivedStatCalculator
-from app.mechanics.stat_calculators import CharacterAttributeCalculator
+from app.mechanics.stat_calculators import CharacterAttributeCalculator, CharacterSkillCalculator
 from app.mechanics.stat_calculators import StatCalculatorError
 from app.perks.perks import PlayerTrait, StatusEffect
 
@@ -50,26 +50,26 @@ class TestPerkSkillCalculator(unittest.TestCase):
         self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
         trait = PlayerTrait(perk_id="trait", tags="trait, skill, test", name="Trait", desc="Test trait.",
-                            effects="skill, melee, -1; skill, guns, 1", conflicts="conflicting_trait")
+                            effects="skill, guns, -1; skill, melee, 1", conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
 
     def test_get_skill_bonus(self):
-        skill_bonus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="guns")
+        skill_bonus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="melee")
         self.assertEqual(1, skill_bonus)
 
     def test_get_skill_malus(self):
-        skill_malus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="melee")
+        skill_malus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="guns")
         self.assertEqual(-1, skill_malus)
 
     def test_get_skill_bonus_from_multiple_perks(self):
         another_trait = PlayerTrait(perk_id="another_trait", tags="trait, skill, test", name="Trait",
-                                    desc="Test trait.", effects="skill, melee, 1; skill, guns, 1",
+                                    desc="Test trait.", effects="skill, guns, 1; skill, melee, 1",
                                     conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_trait)
-        melee_bonus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="melee")
         guns_bonus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="guns")
-        self.assertEqual(0, melee_bonus)
-        self.assertEqual(2, guns_bonus)
+        melee_bonus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="melee")
+        self.assertEqual(0, guns_bonus)
+        self.assertEqual(2, melee_bonus)
 
     def test_get_incorrect_skill_bonus_returns_zero(self):
         skill_bonus = PerkSkillCalculator.get_skill_bonus(perk_inv=self.human.perks, skill="energy")
@@ -141,6 +141,34 @@ class TestCharacterAttributeCalculator(unittest.TestCase):
     def test_incorrect_obj_as_character_raises_exception(self):
         with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for character"):
             CharacterAttributeCalculator.get_strength(character="not Character derived object")
+
+
+class TestCharacterSkillCalculator(unittest.TestCase):
+
+    def setUp(self):
+        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+                           intelligence=5)
+
+    def test_get_character_skills(self):
+        self.assertEqual(1, CharacterSkillCalculator.get_guns(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_energy(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_melee(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_sneak(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_security(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_mechanics(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_survival(character=self.human))
+        self.assertEqual(1, CharacterSkillCalculator.get_medicine(character=self.human))
+
+    def test_get_character_skills_with_perk_bonuses(self):
+        trait = PlayerTrait(perk_id="trait", tags="trait, skill, test", name="Trait", desc="Test trait.",
+                            effects="skill, guns, -1; skill, melee, 1", conflicts="conflicting_trait")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
+        self.assertEqual(0, CharacterSkillCalculator.get_guns(character=self.human))
+        self.assertEqual(2, CharacterSkillCalculator.get_melee(character=self.human))
+
+    def test_incorrect_obj_as_character_raises_exception(self):
+        with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for character"):
+            CharacterSkillCalculator.get_guns(character="not Character derived object")
 
 
 if __name__ == "__main__":

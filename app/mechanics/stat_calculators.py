@@ -186,3 +186,103 @@ class CharacterAttributeCalculator:
             attribute_value += PerkAttributeCalculator.get_attribute_bonus(perk_inv=character.perks,
                                                                            attribute=attribute)
             return attribute_value
+
+
+class CharacterSkillCalculator:
+    """This class calculates effective character skills (base values modified by active perks).
+
+    The class uses StatCalculatorError exception, which is raised when provided character is incorrect or getting
+    incorrect character skills.
+    """
+
+    @staticmethod
+    def get_guns(character):
+        """Get specified character's effective guns skill.
+
+        :param character: Character derived object to get effective guns skill for
+        :return: effective guns skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="guns", character=character)
+
+    @staticmethod
+    def get_energy(character):
+        """Get specified character's effective energy weapons skill.
+
+        :param character: Character derived object to get effective energy weapons skill for
+        :return: effective energy weapons skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="energy", character=character)
+
+    @staticmethod
+    def get_melee(character):
+        """Get specified character's effective melee weapons skill.
+
+        :param character: Character derived object to get effective melee weapons skill for
+        :return: effective melee weapons skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="melee", character=character)
+
+    @staticmethod
+    def get_sneak(character):
+        """Get specified character's effective sneak skill.
+
+        :param character: Character derived object to get effective sneak skill for
+        :return: effective sneak skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="sneak", character=character)
+
+    @staticmethod
+    def get_security(character):
+        """Get specified character's effective security skill.
+
+        :param character: Character derived object to get effective security skill for
+        :return: effective security skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="security", character=character)
+
+    @staticmethod
+    def get_mechanics(character):
+        """Get specified character's effective mechanics skill.
+
+        :param character: Character derived object to get effective mechanics skill for
+        :return: effective mechanics skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="mechanics", character=character)
+
+    @staticmethod
+    def get_survival(character):
+        """Get specified character's effective survival skill.
+
+        :param character: Character derived object to get effective survival skill for
+        :return: effective survival skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="survival", character=character)
+
+    @staticmethod
+    def get_medicine(character):
+        """Get specified character's effective medicine skill.
+
+        :param character: Character derived object to get effective medicine skill for
+        :return: effective medicine skill
+        """
+        return CharacterSkillCalculator._get_skill(skill="medicine", character=character)
+
+    @staticmethod
+    def _get_skill(skill, character):
+        """Get character's specified base skill and calculate and add any bonuses (maluses) provided by character's
+        active perks.
+
+        :param skill: name of the skill to get base value for
+        :param character: Character derived object to get base skill and active perks from
+        :raises StatCalculatorError: when specified character or skill name is incorrect
+        :return: effective skill value
+        """
+        if not isinstance(character, Character):
+            raise StatCalculatorError("incorrect object type for character")
+        try:
+            skill_value = getattr(character, skill)
+        except AttributeError:
+            raise StatCalculatorError("incorrect character skill: {}".format(skill))
+        else:
+            skill_value += PerkSkillCalculator.get_skill_bonus(perk_inv=character.perks, skill=skill)
+            return skill_value
