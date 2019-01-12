@@ -36,3 +36,40 @@ class PerkAttributeCalculator:
             if attribute in effect:
                 attribute_bonus += int(effect.split()[-1])
         return attribute_bonus
+
+
+class PerkSkillCalculator:
+    """This class calculates bonuses (maluses) to character skills given by active perks.
+
+    The class uses PerkInventory class' PerkInventoryError exception, which is raised when specified perk inventory is
+    incorrect.
+    """
+
+    @staticmethod
+    def get_skill_bonus(perk_inv, skill):
+        """Get bonuses (maluses) to specified skill given by perks in specified perk inventory.
+
+        :param perk_inv: PerkInventory object to get bonuses (maluses) from
+        :param skill: name of the skill to check bonuses (maluses) for
+        :raises PerkInventoryError: when specified perk inventory is incorrect
+        """
+        if not isinstance(perk_inv, PerkInventory):
+            raise PerkInventory.PerkInventoryError("incorrect object type for perk inventory")
+        skill_bonus = 0
+        for perk in perk_inv.perks:
+            if "skill" in perk.tags:
+                skill_bonus += PerkSkillCalculator._get_skill_bonus(perk=perk, skill=skill)
+        return skill_bonus
+
+    @staticmethod
+    def _get_skill_bonus(perk, skill):
+        """Get bonuses (maluses) to specified skill from provided perk.
+
+        :param perk: Perk derived object to get bonuses (maluses) from
+        :param skill: name of the skill to check bonuses (maluses) for
+        """
+        skill_bonus = 0
+        for effect in perk.get_effects_list():
+            if skill in effect:
+                skill_bonus += int(effect.split()[-1])
+        return skill_bonus

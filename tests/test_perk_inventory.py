@@ -5,7 +5,7 @@ from app.mechanics.perk_inventory import PerkInventoryStatusEffectDurationLowere
 from app.perks.perks import CharacterPerk, StatusEffect, PlayerTrait
 
 
-class PerkListTests(unittest.TestCase):
+class PerkInventoryTests(unittest.TestCase):
 
     def setUp(self):
         self.perk_inventory = PerkInventory()
@@ -19,7 +19,7 @@ class PerkListTests(unittest.TestCase):
         self.assertEqual(correct_str_print, self.perk_inventory.__str__())
 
 
-class PerkListPerkAdderTests(unittest.TestCase):
+class PerkInventoryPerkAdderTests(unittest.TestCase):
 
     def setUp(self):
         self.perk_inventory = PerkInventory()
@@ -44,7 +44,8 @@ class PerkListPerkAdderTests(unittest.TestCase):
                                    effects="attribute, strength, -1; attribute, agility, 1",
                                    conflicts="conflicting_trait")
         conflicting_trait_to_add = PlayerTrait(perk_id="conflicting_trait", tags="trait, attribute, test", name="Trait",
-                                               desc="Test trait.", effects="attribute, strength, -1",
+                                               desc="Test trait.",
+                                               effects="attribute, strength, 1; attribute, agility, -1",
                                                conflicts="trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=trait_to_add)
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "can't add conflicting trait: .* for trait: .*"):
@@ -56,7 +57,7 @@ class PerkListPerkAdderTests(unittest.TestCase):
 
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
-            PerkInventoryPerkAdder.add_perk(perk_inv="not PerkList object", perk_to_add="perk to add")
+            PerkInventoryPerkAdder.add_perk(perk_inv="not PerkInventory object", perk_to_add="perk to add")
 
     def test_perk_inventory_with_multiple_perks_as_str_representation(self):
         perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
@@ -69,7 +70,7 @@ class PerkListPerkAdderTests(unittest.TestCase):
         self.assertEqual(correct_str_print, self.perk_inventory.__str__())
 
 
-class PerkListPerkRemoverTests(unittest.TestCase):
+class PerkInventoryPerkRemoverTests(unittest.TestCase):
 
     def setUp(self):
         self.perk_inventory = PerkInventory()
@@ -89,10 +90,10 @@ class PerkListPerkRemoverTests(unittest.TestCase):
 
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
-            PerkInventoryPerkRemover.remove_perk(perk_inv="not PerkList object", perk_to_remove="perk to remove")
+            PerkInventoryPerkRemover.remove_perk(perk_inv="not PerkInventory object", perk_to_remove="perk to remove")
 
 
-class PerkListStatusEffectDurationLowererTests(unittest.TestCase):
+class PerkInventoryStatusEffectDurationLowererTests(unittest.TestCase):
 
     def setUp(self):
         self.perk_inventory = PerkInventory()
@@ -116,7 +117,7 @@ class PerkListStatusEffectDurationLowererTests(unittest.TestCase):
 
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
-            PerkInventoryStatusEffectDurationLowerer.lower_status_effects_duration(perk_inv="not PerkList object")
+            PerkInventoryStatusEffectDurationLowerer.lower_status_effects_duration(perk_inv="not PerkInventory object")
 
 
 if __name__ == "__main__":
