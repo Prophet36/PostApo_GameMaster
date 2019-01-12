@@ -1,8 +1,10 @@
 import unittest
 
 from app.characters.characters import Human
-from app.mechanics.perk_inventory import PerkInventory, PerkInventoryPerkAdder
+from app.mechanics.perk_inventory import PerkInventoryPerkAdder
 from app.mechanics.stat_calculators import PerkAttributeCalculator, PerkSkillCalculator, PerkDerivedStatCalculator
+from app.mechanics.stat_calculators import CharacterAttributeCalculator
+from app.mechanics.stat_calculators import StatCalculatorError
 from app.perks.perks import PlayerTrait, StatusEffect
 
 
@@ -38,7 +40,7 @@ class TestPerkAttributeCalculator(unittest.TestCase):
         self.assertEqual(0, attribute_bonus)
 
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
-        with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
+        with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for perk inventory"):
             PerkAttributeCalculator.get_attribute_bonus(perk_inv="not PerkInventory object", attribute="strength")
 
 
@@ -74,7 +76,7 @@ class TestPerkSkillCalculator(unittest.TestCase):
         self.assertEqual(0, skill_bonus)
 
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
-        with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
+        with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for perk inventory"):
             PerkSkillCalculator.get_skill_bonus(perk_inv="not PerkInventory object", skill="guns")
 
 
@@ -112,8 +114,33 @@ class TestPerkDerivedStatCalculator(unittest.TestCase):
         self.assertEqual(0, stat_bonus)
 
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
-        with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
+        with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for perk inventory"):
             PerkDerivedStatCalculator.get_stat_bonus(perk_inv="not PerkInventory object", stat="evasion")
+
+
+class TestCharacterAttributeCalculator(unittest.TestCase):
+
+    def setUp(self):
+        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+                           intelligence=5)
+
+    def test_get_character_attributes(self):
+        self.assertEqual(5, CharacterAttributeCalculator.get_strength(character=self.human))
+        self.assertEqual(5, CharacterAttributeCalculator.get_endurance(character=self.human))
+        self.assertEqual(5, CharacterAttributeCalculator.get_agility(character=self.human))
+        self.assertEqual(5, CharacterAttributeCalculator.get_perception(character=self.human))
+        self.assertEqual(5, CharacterAttributeCalculator.get_intelligence(character=self.human))
+
+    def test_get_character_attributes_with_perk_bonuses(self):
+        trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
+                            effects="attribute, strength, -1; attribute, agility, 1", conflicts="conflicting_trait")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
+        self.assertEqual(4, CharacterAttributeCalculator.get_strength(character=self.human))
+        self.assertEqual(6, CharacterAttributeCalculator.get_agility(character=self.human))
+
+    def test_incorrect_obj_as_character_raises_exception(self):
+        with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for character"):
+            CharacterAttributeCalculator.get_strength(character="not Character derived object")
 
 
 if __name__ == "__main__":
