@@ -286,3 +286,126 @@ class CharacterSkillCalculator:
         else:
             skill_value += PerkSkillCalculator.get_skill_bonus(perk_inv=character.perks, skill=skill)
             return skill_value
+
+
+class CharacterDerivedStatCalculator:
+    """This class calculates effective character derived stats (base values derived from attributes and modified by
+    active perks).
+
+    The class uses StatCalculatorError exception, which is raised when provided character is incorrect.
+    """
+
+    @staticmethod
+    def get_carry_weight(character):
+        """Get specified character's maximum carry weight (based on strength and active perks).
+
+        :param character: Character derived object to get maximum carry weight for
+        :return: maximum carry weight
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        strength = CharacterAttributeCalculator.get_strength(character)
+        carry_weight = 10 + 3 * strength
+        carry_weight += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="carry_weight")
+        return carry_weight
+
+    @staticmethod
+    def get_melee_bonus(character):
+        """Get specified character's melee damage bonus (based on strength and active perks).
+
+        :param character: Character derived object to get melee damage bonus for
+        :return: melee damage bonus
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        strength = CharacterAttributeCalculator.get_strength(character)
+        melee_bonus = 0
+        if strength > 5:
+            melee_bonus = strength - 5
+        melee_bonus += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="melee_bonus")
+        return melee_bonus
+
+    @staticmethod
+    def get_max_health(character):
+        """Get specified character's maximum health (based on endurance, level and active perks).
+
+        :param character: Character derived object to get maximum health for
+        :return: maximum health
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        endurance = CharacterAttributeCalculator.get_endurance(character)
+        level = character.level
+        max_health = (4 * endurance) + (2 * (level - 1))
+        max_health += character.health_bonus
+        max_health += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="health_bonus")
+        return max_health
+
+    @staticmethod
+    def get_rad_res(character):
+        """Get specified character's radiation resistance (based on endurance, active perks and worn armor).
+
+        :param character: Character derived object to get radiation resistance for
+        :return: radiation resistance
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        endurance = CharacterAttributeCalculator.get_endurance(character)
+        rad_res = 0
+        if endurance > 5:
+            rad_res = 5 * (endurance - 5)
+        rad_res += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="rad_res")
+        if character.inventory.equipped_armor is not None:
+            rad_res += character.inventory.equipped_armor.rad_res
+        return rad_res
+
+    @staticmethod
+    def get_evasion(character):
+        """Get specified character's evasion (based on agility, active perks and worn armor).
+
+        :param character: Character derived object to get evasion for
+        :return: evasion
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        agility = CharacterAttributeCalculator.get_agility(character)
+        evasion = 0
+        if agility > 5:
+            evasion = agility - 5
+        evasion += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="evasion")
+        if character.inventory.equipped_armor is not None:
+            evasion += character.inventory.equipped_armor.evasion
+        return evasion
+
+    @staticmethod
+    def get_max_ap(character):
+        """Get specified character's maximum action points (based on agility and active perks).
+
+        :param character: Character derived object to get maximum action points for
+        :return: maximum action points
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        agility = CharacterAttributeCalculator.get_agility(character)
+        action_points = 10 + agility
+        action_points += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="max_ap")
+        return action_points
+
+    @staticmethod
+    def get_exp_mult(character):
+        """Get specified character's experience gain multiplier (based on intelligence and active perks, measured in
+        percents).
+
+        :param character: Character derived object to get experience gain multiplier for
+        :return: experience gain multiplier
+        """
+        CharacterDerivedStatCalculator._check_valid_character(character)
+        intelligence = CharacterAttributeCalculator.get_intelligence(character)
+        exp_mult = 75
+        exp_mult += 5 * intelligence
+        exp_mult += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="exp_mult")
+        return exp_mult
+
+    @staticmethod
+    def _check_valid_character(character):
+        """Check whether specified character is correct Character derived object.
+
+        :param character: Character derived object
+        :raises StatCalculatorError: when specified character is incorrect
+        """
+        if not isinstance(character, Character):
+            raise StatCalculatorError("incorrect object type for character")

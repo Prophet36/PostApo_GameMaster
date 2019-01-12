@@ -4,6 +4,7 @@ from app.characters.characters import Human
 from app.mechanics.perk_inventory import PerkInventoryPerkAdder
 from app.mechanics.stat_calculators import PerkAttributeCalculator, PerkSkillCalculator, PerkDerivedStatCalculator
 from app.mechanics.stat_calculators import CharacterAttributeCalculator, CharacterSkillCalculator
+from app.mechanics.stat_calculators import CharacterDerivedStatCalculator
 from app.mechanics.stat_calculators import StatCalculatorError
 from app.perks.perks import PlayerTrait, StatusEffect
 
@@ -96,9 +97,9 @@ class TestPerkDerivedStatCalculator(unittest.TestCase):
     def test_get_stat_malus(self):
         another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
                                              name="Status Effect", desc="Test status effect.",
-                                             effects="action_points, -1", duration=1)
+                                             effects="max_ap, -1", duration=1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_status_effect)
-        stat_malus = PerkDerivedStatCalculator.get_stat_bonus(perk_inv=self.human.perks, stat="action_points")
+        stat_malus = PerkDerivedStatCalculator.get_stat_bonus(perk_inv=self.human.perks, stat="max_ap")
         self.assertEqual(-1, stat_malus)
 
     def test_get_stat_bonus_from_multiple_perks(self):
@@ -169,6 +170,37 @@ class TestCharacterSkillCalculator(unittest.TestCase):
     def test_incorrect_obj_as_character_raises_exception(self):
         with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for character"):
             CharacterSkillCalculator.get_guns(character="not Character derived object")
+
+
+class TestCharacterDerivedStatCalculator(unittest.TestCase):
+
+    def setUp(self):
+        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+                           intelligence=5)
+
+    def test_get_derived_stats(self):
+        self.assertEqual(25, CharacterDerivedStatCalculator.get_carry_weight(character=self.human))
+        self.assertEqual(0, CharacterDerivedStatCalculator.get_melee_bonus(character=self.human))
+        self.assertEqual(30, CharacterDerivedStatCalculator.get_max_health(character=self.human))
+        self.assertEqual(0, CharacterDerivedStatCalculator.get_rad_res(character=self.human))
+        self.assertEqual(0, CharacterDerivedStatCalculator.get_evasion(character=self.human))
+        self.assertEqual(15, CharacterDerivedStatCalculator.get_max_ap(character=self.human))
+        self.assertEqual(100, CharacterDerivedStatCalculator.get_exp_mult(character=self.human))
+
+    def test_get_derived_stats_with_perk_bonuses(self):
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1", duration=1)
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+                                             name="Status Effect", desc="Test status effect.",
+                                             effects="max_ap, -1", duration=1)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=status_effect)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_status_effect)
+        self.assertEqual(1, CharacterDerivedStatCalculator.get_evasion(character=self.human))
+        self.assertEqual(14, CharacterDerivedStatCalculator.get_max_ap(character=self.human))
+
+    def test_incorrect_obj_as_character_raises_exception(self):
+        with self.assertRaisesRegex(StatCalculatorError, "incorrect object type for character"):
+            CharacterDerivedStatCalculator.get_carry_weight(character="not Character derived object")
 
 
 if __name__ == "__main__":
