@@ -2,8 +2,8 @@ import unittest
 
 from app.characters.characters import Human
 from app.mechanics.perk_inventory import PerkInventory, PerkInventoryPerkAdder
-from app.mechanics.stat_calculators import PerkAttributeCalculator, PerkSkillCalculator
-from app.perks.perks import PlayerTrait
+from app.mechanics.stat_calculators import PerkAttributeCalculator, PerkSkillCalculator, PerkDerivedStatCalculator
+from app.perks.perks import PlayerTrait, StatusEffect
 
 
 class TestPerkAttributeCalculator(unittest.TestCase):
@@ -76,6 +76,44 @@ class TestPerkSkillCalculator(unittest.TestCase):
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
             PerkSkillCalculator.get_skill_bonus(perk_inv="not PerkInventory object", skill="guns")
+
+
+class TestPerkDerivedStatCalculator(unittest.TestCase):
+
+    def setUp(self):
+        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+                           intelligence=5)
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1", duration=1)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=status_effect)
+
+    def test_get_stat_bonus(self):
+        stat_bonus = PerkDerivedStatCalculator.get_stat_bonus(perk_inv=self.human.perks, stat="evasion")
+        self.assertEqual(1, stat_bonus)
+
+    def test_get_stat_malus(self):
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+                                             name="Status Effect", desc="Test status effect.",
+                                             effects="action_points, -1", duration=1)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_status_effect)
+        stat_malus = PerkDerivedStatCalculator.get_stat_bonus(perk_inv=self.human.perks, stat="action_points")
+        self.assertEqual(-1, stat_malus)
+
+    def test_get_stat_bonus_from_multiple_perks(self):
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+                                             name="Status Effect", desc="Test status effect.", effects="evasion, 1",
+                                             duration=1)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_status_effect)
+        evasion_bonus = PerkDerivedStatCalculator.get_stat_bonus(perk_inv=self.human.perks, stat="evasion")
+        self.assertEqual(2, evasion_bonus)
+
+    def test_get_incorrect_stat_bonus_returns_zero(self):
+        stat_bonus = PerkDerivedStatCalculator.get_stat_bonus(perk_inv=self.human.perks, stat="health_bonus")
+        self.assertEqual(0, stat_bonus)
+
+    def test_incorrect_obj_as_perk_inventory_raises_exception(self):
+        with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
+            PerkDerivedStatCalculator.get_stat_bonus(perk_inv="not PerkInventory object", stat="evasion")
 
 
 if __name__ == "__main__":

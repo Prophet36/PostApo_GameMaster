@@ -73,3 +73,39 @@ class PerkSkillCalculator:
             if skill in effect:
                 skill_bonus += int(effect.split()[-1])
         return skill_bonus
+
+
+class PerkDerivedStatCalculator:
+    """This class calculates bonuses (maluses) to character's derived stats given by active perks.
+
+    The class uses PerkInventory class' PerkInventoryError exception, which is raised when specified perk inventory is
+    incorrect.
+    """
+
+    @staticmethod
+    def get_stat_bonus(perk_inv, stat):
+        """Get bonuses (maluses) to specified derived stat given by perks in specified perk inventory.
+
+        :param perk_inv: PerkInventory object to get bonuses (maluses) from
+        :param stat: name of the derived stat to check bonuses (maluses) for
+        :raises PerkInventoryError: when specified perk inventory is incorrect
+        """
+        if not isinstance(perk_inv, PerkInventory):
+            raise PerkInventory.PerkInventoryError("incorrect object type for perk inventory")
+        stat_bonus = 0
+        for perk in perk_inv.perks:
+            stat_bonus += PerkDerivedStatCalculator._get_stat_bonus(perk=perk, stat=stat)
+        return stat_bonus
+
+    @staticmethod
+    def _get_stat_bonus(perk, stat):
+        """Get bonuses (maluses) to specified derived stat from provided perk.
+
+        :param perk: Perk derived object to get bonuses (maluses) from
+        :param stat: name of the derived stat to check bonuses (maluses) for
+        """
+        stat_bonus = 0
+        for effect in perk.get_effects_list():
+            if stat in effect:
+                stat_bonus += int(effect.split()[-1])
+        return stat_bonus
