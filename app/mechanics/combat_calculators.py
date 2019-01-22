@@ -33,7 +33,8 @@ class DamageCalculator:
         base_damage = DamageCalculator._get_base_weapon_damage(character=character)
         base_damage += DamageCalculator._get_weapon_type_damage_bonus(character=character)
         base_damage += DamageCalculator._get_opponent_type_damage_bonus(character=character, opponent=opponent)
-        effective_damage = DamageCalculator._get_effective_damage(character=character, effective_base_damage=base_damage)
+        effective_damage = DamageCalculator._get_effective_damage(character=character,
+                                                                  effective_base_damage=base_damage)
         return effective_damage
 
     @staticmethod
@@ -116,3 +117,107 @@ class DamageCalculator:
         damage_roll = character.inventory.equipped_weapon.damage.split(" + ")[-1]
         effective_damage = str(effective_base_damage) + " + " + damage_roll
         return effective_damage
+
+
+class DamageFormulaCalculator:
+    """This class gets standard damage formulas (damage string formatted as A + XdY, with A + being optional if zero)
+    and returns as tuples (A, X, Y) or calculates those tuples to obtain minimum and maximum potential damage provided
+    by the formula.
+
+    The class uses CombatCalculatorError exception, which is raised when provided damage formula strings are incorrect.
+    """
+
+    @staticmethod
+    def get_damage_tuple(damage_formula):
+        """Converts standard damage formula string into tuple.
+
+        :param damage_formula: standard damage formula string
+        :return: tuple of damage formula numbers
+        """
+        damage_tuple = DamageFormulaCalculator._convert_damage_formula(damage_formula=damage_formula)
+        return damage_tuple
+
+    @staticmethod
+    def get_damage_range(damage_formula):
+        """Calculates standard damage formula string to tuple of minimum and maximum potential damage.
+
+        :param damage_formula: standard damage formula string
+        :return: tuple of minimum and maximum potential damage numbers
+        """
+        damage_tuple = DamageFormulaCalculator._convert_damage_formula(damage_formula=damage_formula)
+        damage_range = DamageFormulaCalculator._get_damage_range(damage_tuple=damage_tuple)
+        return damage_range
+
+    @staticmethod
+    def _convert_damage_formula(damage_formula):
+        """Converts standard damage formula string into tuple.
+
+        :param damage_formula: standard damage formula string to convert
+        :raises CombatCalculatorError: when provided damage formula string is incorrect
+        :return: tuple of damage formula numbers
+        """
+        try:
+            damage_formula = damage_formula.split(" + ")
+        except AttributeError:
+            raise CombatCalculatorError("incorrect string for damage formula")
+        if len(damage_formula) == 1:
+            base_damage = 0
+            damage_roll = DamageFormulaCalculator._convert_damage_roll(damage_roll=damage_formula[0])
+        elif len(damage_formula) == 2:
+            base_damage = damage_formula[0]
+            damage_roll = DamageFormulaCalculator._convert_damage_roll(damage_roll=damage_formula[1])
+        else:
+            raise CombatCalculatorError("incorrect string for damage formula")
+        damage_tuple = DamageFormulaCalculator._get_damage_tuple(base_damage=base_damage, damage_roll=damage_roll)
+        return damage_tuple
+
+    @staticmethod
+    def _convert_damage_roll(damage_roll):
+        """Converts roll part of standard damage formula string into tuple.
+
+        :param damage_roll: roll part of standard damage formula string
+        :raises CombatCalculatorError: when provided damage roll string is incorrect
+        :return: tuple of damage roll numbers
+        """
+        damage_roll = damage_roll.split("d")
+        if damage_roll[0] == "":
+            number_of_rolls = 1
+        else:
+            try:
+                number_of_rolls = int(damage_roll[0])
+            except ValueError:
+                raise CombatCalculatorError("incorrect string for damage formula")
+        try:
+            roll = int(damage_roll[1])
+        except ValueError:
+            raise CombatCalculatorError("incorrect string for damage formula")
+        roll_tuple = (number_of_rolls, roll)
+        return roll_tuple
+
+    @staticmethod
+    def _get_damage_tuple(base_damage, damage_roll):
+        """Combines numbers of standard damage formula string into tuple.
+
+        :param base_damage: base damage part of standard formula string
+        :param damage_roll: tuple of damage roll numbers
+        :raises CombatCalculatorError: when provided base damage string is incorrect
+        :return: tuple of damage formula numbers
+        """
+        try:
+            base_damage = int(base_damage)
+        except ValueError:
+            raise CombatCalculatorError("incorrect string for damage formula")
+        damage_tuple = (base_damage,) + damage_roll
+        return damage_tuple
+
+    @staticmethod
+    def _get_damage_range(damage_tuple):
+        """Calculates minimum and maximum potential damage based on tuple of damage formula numbers.
+
+        :param damage_tuple: tuple of damage formula numbers to calculate from
+        :return: tuple of minimum and maximum potential damage
+        """
+        min_damage = damage_tuple[0] + damage_tuple[1]
+        max_damage = damage_tuple[0] + damage_tuple[1] * damage_tuple[2]
+        damage_range = (min_damage, max_damage)
+        return damage_range

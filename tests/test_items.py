@@ -64,31 +64,6 @@ class MeleeWeaponTests(unittest.TestCase):
         self.assertEqual(5, self.weapon.value)
         self.assertEqual(1.0, self.weapon.weight)
 
-    def test_damage_range_with_full_damage_formula_multiple_rolls(self):
-        damage_range = self.weapon.get_dmg_range()
-        self.assertTupleEqual((6, 26), damage_range)
-
-    def test_damage_range_with_full_damage_formula_single_roll(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
-                             damage="2 + d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
-                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
-        damage_range = weapon.get_dmg_range()
-        self.assertTupleEqual((3, 8), damage_range)
-
-    def test_damage_range_with_multiple_rolls_only(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
-                             damage="4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
-                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
-        damage_range = weapon.get_dmg_range()
-        self.assertTupleEqual((4, 24), damage_range)
-
-    def test_damage_range_with_single_roll_only(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
-                             damage="d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
-                             ap_cost=10, st_requirement=1, value=5, weight=1.0)
-        damage_range = weapon.get_dmg_range()
-        self.assertTupleEqual((1, 6), damage_range)
-
     def test_effect_chance_in_percents(self):
         self.assertEqual(40, self.weapon.get_effect_chance())
 
@@ -134,31 +109,6 @@ class RangedWeaponTests(unittest.TestCase):
         self.assertEqual(1, self.weapon.st_requirement)
         self.assertEqual(10, self.weapon.value)
         self.assertEqual(2.0, self.weapon.weight)
-
-    def test_damage_range_with_full_damage_formula_multiple_rolls(self):
-        damage_range = self.weapon.get_dmg_range()
-        self.assertTupleEqual((6, 26), damage_range)
-
-    def test_damage_range_with_full_damage_formula_single_roll(self):
-        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="2 + d6",
-                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
-                              value=10, weight=2.0)
-        damage_range = weapon.get_dmg_range()
-        self.assertTupleEqual((3, 8), damage_range)
-
-    def test_damage_range_with_multiple_rolls_only(self):
-        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="4d6",
-                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
-                              value=10, weight=2.0)
-        damage_range = weapon.get_dmg_range()
-        self.assertTupleEqual((4, 24), damage_range)
-
-    def test_damage_range_with_single_roll_only(self):
-        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="d6",
-                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
-                              value=10, weight=2.0)
-        damage_range = weapon.get_dmg_range()
-        self.assertTupleEqual((1, 6), damage_range)
 
     def test_set_current_ammo_amount(self):
         self.weapon.current_ammo = 5
