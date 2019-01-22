@@ -10,19 +10,19 @@ class CharacterTests(unittest.TestCase):
 
     def test_create_character_instance_raises_exception(self):
         with self.assertRaisesRegex(TypeError, "Can't instantiate abstract class .* with abstract methods .*"):
-            Character(name="Character", tags="character, test", level=1, strength=5, endurance=5, agility=5,
-                      perception=5, intelligence=5)
+            Character(name="Character", tags="character", level=1, strength=5, endurance=5, agility=5, perception=5,
+                      intelligence=5)
 
 
 class HumanTests(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
 
     def test_property_values(self):
         self.assertEqual("Human", self.human.name)
-        self.assertEqual("human, test", self.human.tags)
+        self.assertEqual("human", self.human.tags)
         self.assertEqual(1, self.human.level)
         self.assertEqual(5, self.human.strength)
         self.assertEqual(5, self.human.endurance)
@@ -45,7 +45,7 @@ class HumanTests(unittest.TestCase):
         self.assertIsInstance(self.human.perks, PerkInventory)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("name: Human, tags: human, test, level: 1,\nstrength: 5, endurance: 5, agility: 5, "
+        correct_str_print = ("name: Human, tags: human, level: 1,\nstrength: 5, endurance: 5, agility: 5, "
                              "perception: 5, intelligence: 5,\nguns: 1, energy weapons: 1, melee weapons: 1,\n"
                              "sneak: 1, security: 1, mechanics: 1, survival: 1, medicine: 1")
         self.assertEqual(correct_str_print, self.human.__str__())
@@ -54,12 +54,12 @@ class HumanTests(unittest.TestCase):
 class PlayerTests(unittest.TestCase):
     
     def setUp(self):
-        self.player = Player(name="Player", tags="human, player, test", level=1, strength=5, endurance=5, agility=5,
+        self.player = Player(name="Player", tags="human, player", level=1, strength=5, endurance=5, agility=5,
                              perception=5, intelligence=5, experience=500)
     
     def test_property_values(self):
         self.assertEqual("Player", self.player.name)
-        self.assertEqual("human, player, test", self.player.tags)
+        self.assertEqual("human, player", self.player.tags)
         self.assertEqual(1, self.player.level)
         self.assertEqual(5, self.player.strength)
         self.assertEqual(5, self.player.endurance)
@@ -83,7 +83,7 @@ class PlayerTests(unittest.TestCase):
         self.assertIsInstance(self.player.perks, PerkInventory)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("name: Player, tags: human, player, test, level: 1, experience: 500,\nstrength: 5, "
+        correct_str_print = ("name: Player, tags: human, player, level: 1, experience: 500,\nstrength: 5, "
                              "endurance: 5, agility: 5, perception: 5, intelligence: 5,\nguns: 1, energy weapons: 1, "
                              "melee weapons: 1,\nsneak: 1, security: 1, mechanics: 1, survival: 1, medicine: 1")
         self.assertEqual(correct_str_print, self.player.__str__())
@@ -92,12 +92,12 @@ class PlayerTests(unittest.TestCase):
 class CritterTests(unittest.TestCase):
 
     def setUp(self):
-        self.critter = Critter(name="Critter", tags="critter, test", level=1, strength=5, endurance=5, agility=5,
+        self.critter = Critter(name="Critter", tags="critter", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5, health_bonus=10, exp_award=10)
 
     def test_property_values(self):
         self.assertEqual("Critter", self.critter.name)
-        self.assertEqual("critter, test", self.critter.tags)
+        self.assertEqual("critter", self.critter.tags)
         self.assertEqual(1, self.critter.level)
         self.assertEqual(5, self.critter.strength)
         self.assertEqual(5, self.critter.endurance)
@@ -112,8 +112,8 @@ class CritterTests(unittest.TestCase):
         self.assertIsInstance(self.critter.perks, PerkInventory)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("name: Critter, tags: critter, test, level: 1,\nstrength: 5, endurance: 5, "
-                             "agility: 5, perception: 5, intelligence: 5,\nexperience award: 10")
+        correct_str_print = ("name: Critter, tags: critter, level: 1,\nstrength: 5, endurance: 5, agility: 5, "
+                             "perception: 5, intelligence: 5,\nexperience award: 10")
         self.assertEqual(correct_str_print, self.critter.__str__())
 
 

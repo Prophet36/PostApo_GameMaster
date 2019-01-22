@@ -12,9 +12,9 @@ from app.perks.perks import PlayerTrait, StatusEffect
 class TestPerkAttributeCalculator(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
-        trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
+        trait = PlayerTrait(perk_id="trait", tags="trait, attribute", name="Trait", desc="Test trait.",
                             effects="attribute, strength, -1; attribute, agility, 1", conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
 
@@ -27,8 +27,8 @@ class TestPerkAttributeCalculator(unittest.TestCase):
         self.assertEqual(-1, attribute_malus)
 
     def test_get_attribute_bonus_from_multiple_perks(self):
-        another_trait = PlayerTrait(perk_id="another_trait", tags="trait, attribute, test", name="Trait",
-                                    desc="Test trait.", effects="attribute, strength, 1; attribute, agility, 1",
+        another_trait = PlayerTrait(perk_id="another_trait", tags="trait, attribute", name="Trait", desc="Test trait.",
+                                    effects="attribute, strength, 1; attribute, agility, 1",
                                     conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_trait)
         strength_bonus = PerkAttributeCalculator.get_attribute_bonus(perk_inv=self.human.perks, attribute="strength")
@@ -48,9 +48,9 @@ class TestPerkAttributeCalculator(unittest.TestCase):
 class TestPerkSkillCalculator(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
-        trait = PlayerTrait(perk_id="trait", tags="trait, skill, test", name="Trait", desc="Test trait.",
+        trait = PlayerTrait(perk_id="trait", tags="trait, skill", name="Trait", desc="Test trait.",
                             effects="skill, guns, -1; skill, melee, 1", conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
 
@@ -63,7 +63,7 @@ class TestPerkSkillCalculator(unittest.TestCase):
         self.assertEqual(-1, skill_malus)
 
     def test_get_skill_bonus_from_multiple_perks(self):
-        another_trait = PlayerTrait(perk_id="another_trait", tags="trait, skill, test", name="Trait",
+        another_trait = PlayerTrait(perk_id="another_trait", tags="trait, skill", name="Trait",
                                     desc="Test trait.", effects="skill, guns, 1; skill, melee, 1",
                                     conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_trait)
@@ -84,9 +84,9 @@ class TestPerkSkillCalculator(unittest.TestCase):
 class TestPerkDerivedStatCalculator(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1", duration=1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=status_effect)
 
@@ -95,7 +95,7 @@ class TestPerkDerivedStatCalculator(unittest.TestCase):
         self.assertEqual(1, stat_bonus)
 
     def test_get_stat_malus(self):
-        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion",
                                              name="Status Effect", desc="Test status effect.",
                                              effects="max_ap, -1", duration=1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_status_effect)
@@ -103,7 +103,7 @@ class TestPerkDerivedStatCalculator(unittest.TestCase):
         self.assertEqual(-1, stat_malus)
 
     def test_get_stat_bonus_from_multiple_perks(self):
-        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion",
                                              name="Status Effect", desc="Test status effect.", effects="evasion, 1",
                                              duration=1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=another_status_effect)
@@ -122,7 +122,7 @@ class TestPerkDerivedStatCalculator(unittest.TestCase):
 class TestCharacterAttributeCalculator(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
 
     def test_get_character_attributes(self):
@@ -133,7 +133,7 @@ class TestCharacterAttributeCalculator(unittest.TestCase):
         self.assertEqual(5, CharacterAttributeCalculator.get_intelligence(character=self.human))
 
     def test_get_character_attributes_with_perk_bonuses(self):
-        trait = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
+        trait = PlayerTrait(perk_id="trait", tags="trait, attribute", name="Trait", desc="Test trait.",
                             effects="attribute, strength, -1; attribute, agility, 1", conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
         self.assertEqual(4, CharacterAttributeCalculator.get_strength(character=self.human))
@@ -147,7 +147,7 @@ class TestCharacterAttributeCalculator(unittest.TestCase):
 class TestCharacterSkillCalculator(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
 
     def test_get_character_skills(self):
@@ -161,7 +161,7 @@ class TestCharacterSkillCalculator(unittest.TestCase):
         self.assertEqual(1, CharacterSkillCalculator.get_medicine(character=self.human))
 
     def test_get_character_skills_with_perk_bonuses(self):
-        trait = PlayerTrait(perk_id="trait", tags="trait, skill, test", name="Trait", desc="Test trait.",
+        trait = PlayerTrait(perk_id="trait", tags="trait, skill", name="Trait", desc="Test trait.",
                             effects="skill, guns, -1; skill, melee, 1", conflicts="conflicting_trait")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=trait)
         self.assertEqual(0, CharacterSkillCalculator.get_guns(character=self.human))
@@ -175,7 +175,7 @@ class TestCharacterSkillCalculator(unittest.TestCase):
 class TestCharacterDerivedStatCalculator(unittest.TestCase):
 
     def setUp(self):
-        self.human = Human(name="Human", tags="human, test", level=1, strength=5, endurance=5, agility=5, perception=5,
+        self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
                            intelligence=5)
 
     def test_get_derived_stats(self):
@@ -188,9 +188,9 @@ class TestCharacterDerivedStatCalculator(unittest.TestCase):
         self.assertEqual(100, CharacterDerivedStatCalculator.get_exp_mult(character=self.human))
 
     def test_get_derived_stats_with_perk_bonuses(self):
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1", duration=1)
-        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion",
                                              name="Status Effect", desc="Test status effect.",
                                              effects="max_ap, -1", duration=1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.human.perks, perk_to_add=status_effect)

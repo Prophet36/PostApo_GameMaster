@@ -1,7 +1,7 @@
 # armor #
 
 id:                    armor
-tags:                  armor, test
+tags:                  armor
 name:                  Armor
 description:           Test armor.
 damage_resistance:     0
@@ -13,7 +13,7 @@ weight:                2.5
 # weapons - melee #
 
 id:                    melee
-tags:                  weapon, melee, sharp, test
+tags:                  weapon, melee, sharp
 name:                  Melee
 description:           Test melee.
 damage:                2 + 4d6
@@ -29,7 +29,7 @@ weight:                1.0
 # weapons - guns #
 
 id:                    gun
-tags:                  weapon, gun, short, test
+tags:                  weapon, gun, short
 name:                  Gun
 description:           Test gun.
 damage:                2 + 4d6
@@ -45,7 +45,7 @@ weight:                2.0
 # weapons - energy #
 
 id:                    laser
-tags:                  weapon, energy, laser, short, test
+tags:                  weapon, energy, short, laser
 name:                  Laser
 description:           Test laser.
 damage:                2 + 4d6
@@ -61,7 +61,7 @@ weight:                2.0
 # ammo #
 
 id:                    ammo
-tags:                  ammo, stackable, test
+tags:                  ammo, stackable
 name:                  Ammo
 description:           Test ammo.
 max_stack:             50
@@ -71,7 +71,7 @@ weight:                0.01
 # items - consumables #
 
 id:                    consumable
-tags:                  consumable, stackable, test
+tags:                  consumable, stackable
 name:                  Consumable
 description:           Test consumable.
 effect:                none

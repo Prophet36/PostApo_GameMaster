@@ -25,7 +25,7 @@ class PerkInventoryPerkAdderTests(unittest.TestCase):
         self.perk_inventory = PerkInventory()
 
     def test_add_perk(self):
-        perk_to_add = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+        perk_to_add = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
                                     effects="weapon, short, ap_cost, -1", requirements="attribute, agility, 6")
         self.assertEqual(0, len(self.perk_inventory.perks))
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=perk_to_add)
@@ -33,17 +33,17 @@ class PerkInventoryPerkAdderTests(unittest.TestCase):
         self.assertIs(perk_to_add, self.perk_inventory.perks[0])
 
     def test_add_already_existing_perk_raises_exception(self):
-        perk_to_add = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+        perk_to_add = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
                                     effects="weapon, short, ap_cost, -1", requirements="attribute, agility, 6")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=perk_to_add)
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "can't add already existing perk: .*"):
             PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=perk_to_add)
 
     def test_add_conflicting_trait_raises_exception(self):
-        trait_to_add = PlayerTrait(perk_id="trait", tags="trait, attribute, test", name="Trait", desc="Test trait.",
+        trait_to_add = PlayerTrait(perk_id="trait", tags="trait, attribute", name="Trait", desc="Test trait.",
                                    effects="attribute, strength, -1; attribute, agility, 1",
                                    conflicts="conflicting_trait")
-        conflicting_trait_to_add = PlayerTrait(perk_id="conflicting_trait", tags="trait, attribute, test", name="Trait",
+        conflicting_trait_to_add = PlayerTrait(perk_id="conflicting_trait", tags="trait, attribute", name="Trait",
                                                desc="Test trait.",
                                                effects="attribute, strength, 1; attribute, agility, -1",
                                                conflicts="trait")
@@ -60,9 +60,9 @@ class PerkInventoryPerkAdderTests(unittest.TestCase):
             PerkInventoryPerkAdder.add_perk(perk_inv="not PerkInventory object", perk_to_add="perk to add")
 
     def test_perk_inventory_with_multiple_perks_as_str_representation(self):
-        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
                              effects="weapon, short, ap_cost, -1", requirements="attribute, agility, 6")
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1", duration=1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=perk)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=status_effect)
@@ -76,7 +76,7 @@ class PerkInventoryPerkRemoverTests(unittest.TestCase):
         self.perk_inventory = PerkInventory()
 
     def test_remove_perk(self):
-        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
                              effects="weapon, short, ap_cost, -1", requirements="attribute, agility, 6")
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=perk)
         self.assertEqual(1, len(self.perk_inventory.perks))
@@ -97,11 +97,11 @@ class PerkInventoryStatusEffectDurationLowererTests(unittest.TestCase):
 
     def setUp(self):
         self.perk_inventory = PerkInventory()
-        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost, test", name="Perk", desc="Test perk.",
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
                              effects="weapon, short, ap_cost, -1", requirements="attribute, agility, 6")
-        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion, test", name="Status Effect",
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion", name="Status Effect",
                                      desc="Test status effect.", effects="evasion, 1", duration=1)
-        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion, test",
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion",
                                              name="Status Effect", desc="Test status effect.", effects="evasion, 1",
                                              duration=-1)
         PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=perk)

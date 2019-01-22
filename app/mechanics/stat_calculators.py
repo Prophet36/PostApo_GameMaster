@@ -1,4 +1,7 @@
 from app.characters.characters import Character
+from app.config.game_config import get_carry_weight_base, get_carry_weight_strength_mult
+from app.config.game_config import get_health_endurance_mult, get_health_level_mult, get_rad_res_endurance_mult
+from app.config.game_config import get_action_points_base, get_exp_gain_mult_base, get_exp_gain_mult_intelligence_bonus
 from app.mechanics.perk_inventory import PerkInventory
 
 
@@ -304,7 +307,7 @@ class CharacterDerivedStatCalculator:
         """
         CharacterDerivedStatCalculator._check_valid_character(character)
         strength = CharacterAttributeCalculator.get_strength(character)
-        carry_weight = 10 + 3 * strength
+        carry_weight = get_carry_weight_base() + get_carry_weight_strength_mult() * strength
         carry_weight += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="carry_weight")
         return carry_weight
 
@@ -333,7 +336,7 @@ class CharacterDerivedStatCalculator:
         CharacterDerivedStatCalculator._check_valid_character(character)
         endurance = CharacterAttributeCalculator.get_endurance(character)
         level = character.level
-        max_health = (4 * endurance) + (2 * (level - 1))
+        max_health = (get_health_endurance_mult() * endurance) + (get_health_level_mult() * (level - 1))
         max_health += character.health_bonus
         max_health += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="health_bonus")
         return max_health
@@ -349,7 +352,7 @@ class CharacterDerivedStatCalculator:
         endurance = CharacterAttributeCalculator.get_endurance(character)
         rad_res = 0
         if endurance > 5:
-            rad_res = 5 * (endurance - 5)
+            rad_res = get_rad_res_endurance_mult() * (endurance - 5)
         rad_res += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="rad_res")
         if character.inventory.equipped_armor is not None:
             rad_res += character.inventory.equipped_armor.rad_res
@@ -381,7 +384,7 @@ class CharacterDerivedStatCalculator:
         """
         CharacterDerivedStatCalculator._check_valid_character(character)
         agility = CharacterAttributeCalculator.get_agility(character)
-        action_points = 10 + agility
+        action_points = get_action_points_base() + agility
         action_points += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="max_ap")
         return action_points
 
@@ -395,8 +398,8 @@ class CharacterDerivedStatCalculator:
         """
         CharacterDerivedStatCalculator._check_valid_character(character)
         intelligence = CharacterAttributeCalculator.get_intelligence(character)
-        exp_mult = 75
-        exp_mult += 5 * intelligence
+        exp_mult = get_exp_gain_mult_base()
+        exp_mult += get_exp_gain_mult_intelligence_bonus() * intelligence
         exp_mult += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="exp_mult")
         return exp_mult
 

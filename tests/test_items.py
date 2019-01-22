@@ -9,18 +9,18 @@ class ItemTests(unittest.TestCase):
 
     def test_create_item_instance_raises_exception(self):
         with self.assertRaisesRegex(TypeError, "Can't instantiate abstract class .* with abstract methods .*"):
-            Item(item_id="item", tags="item, test", name="Item", desc="Test item.", value=0, weight=0.0)
+            Item(item_id="item", tags="item", name="Item", desc="Test item.", value=0, weight=0.0)
 
 
 class ArmorTests(unittest.TestCase):
 
     def setUp(self):
-        self.armor = Armor(item_id="armor", tags="armor, test", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+        self.armor = Armor(item_id="armor", tags="armor", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
                            evasion=2, value=10, weight=2.5)
 
     def test_property_values(self):
         self.assertEqual("armor", self.armor.item_id)
-        self.assertEqual("armor, test", self.armor.tags)
+        self.assertEqual("armor", self.armor.tags)
         self.assertEqual("Armor", self.armor.name)
         self.assertEqual("Test armor.", self.armor.desc)
         self.assertEqual(0, self.armor.dmg_res)
@@ -30,8 +30,8 @@ class ArmorTests(unittest.TestCase):
         self.assertEqual(2.5, self.armor.weight)
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: armor, tags: armor, test, name: Armor, description: Test armor.,\ndamage resistance: "
-                             "0, radiation resistance: 10, evasion: 2, value: 10, weight: 2.5")
+        correct_str_print = ("ID: armor, tags: armor, name: Armor, description: Test armor.,\ndamage resistance: 0, "
+                             "radiation resistance: 10, evasion: 2, value: 10, weight: 2.5")
         self.assertEqual(correct_str_print, self.armor.__str__())
 
 
@@ -45,13 +45,13 @@ class WeaponTests(unittest.TestCase):
 class MeleeWeaponTests(unittest.TestCase):
 
     def setUp(self):
-        self.weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+        self.weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
                                   damage="2 + 4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0,
                                   accuracy=0, ap_cost=10, st_requirement=1, value=5, weight=1.0)
 
     def test_property_values(self):
         self.assertEqual("melee", self.weapon.item_id)
-        self.assertEqual("weapon, melee, sharp, test", self.weapon.tags)
+        self.assertEqual("weapon, melee, sharp", self.weapon.tags)
         self.assertEqual("Melee", self.weapon.name)
         self.assertEqual("Test melee.", self.weapon.desc)
         self.assertEqual("2 + 4d6", self.weapon.damage)
@@ -69,21 +69,21 @@ class MeleeWeaponTests(unittest.TestCase):
         self.assertTupleEqual((6, 26), damage_range)
 
     def test_damage_range_with_full_damage_formula_single_roll(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
                              damage="2 + d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
                              ap_cost=10, st_requirement=1, value=5, weight=1.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((3, 8), damage_range)
 
     def test_damage_range_with_multiple_rolls_only(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
                              damage="4d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
                              ap_cost=10, st_requirement=1, value=5, weight=1.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((4, 24), damage_range)
 
     def test_damage_range_with_single_roll_only(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
                              damage="d6", effect="bleed_minor", eff_chance="-6 + d10", armor_pen=0, accuracy=0,
                              ap_cost=10, st_requirement=1, value=5, weight=1.0)
         damage_range = weapon.get_dmg_range()
@@ -93,20 +93,20 @@ class MeleeWeaponTests(unittest.TestCase):
         self.assertEqual(40, self.weapon.get_effect_chance())
 
     def test_effect_chance_with_no_effect(self):
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
                              damage="d6", effect="none", eff_chance="0", armor_pen=0, accuracy=0, ap_cost=10,
                              st_requirement=1, value=5, weight=1.0)
         self.assertEqual(0, weapon.get_effect_chance())
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: melee, tags: weapon, melee, sharp, test, name: Melee, description: Test melee.,\n"
+        correct_str_print = ("ID: melee, tags: weapon, melee, sharp, name: Melee, description: Test melee.,\n"
                              "damage: 2 + 4d6 (6 - 26), effect: bleed_minor, with -6 + d10 chance (40%), penetration: "
                              "0, accuracy: 0,\nAP: 10, strength required: 1, value: 5, weight: 1.0")
         self.assertEqual(correct_str_print, self.weapon.__str__())
-        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp, test", name="Melee", desc="Test melee.",
+        weapon = MeleeWeapon(item_id="melee", tags="weapon, melee, sharp", name="Melee", desc="Test melee.",
                              damage="2 + 4d6", effect="none", eff_chance="0", armor_pen=0, accuracy=0, ap_cost=10,
                              st_requirement=1, value=5, weight=1.0)
-        correct_str_print = ("ID: melee, tags: weapon, melee, sharp, test, name: Melee, description: Test melee.,\n"
+        correct_str_print = ("ID: melee, tags: weapon, melee, sharp, name: Melee, description: Test melee.,\n"
                              "damage: 2 + 4d6 (6 - 26), effect: none, penetration: 0, accuracy: 0,\nAP: 10, "
                              "strength required: 1, value: 5, weight: 1.0")
         self.assertEqual(correct_str_print, weapon.__str__())
@@ -115,13 +115,13 @@ class MeleeWeaponTests(unittest.TestCase):
 class RangedWeaponTests(unittest.TestCase):
 
     def setUp(self):
-        self.weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
+        self.weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.",
                                    damage="2 + 4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0,
                                    ap_cost=10, st_requirement=1, value=10, weight=2.0)
 
     def test_property_values(self):
         self.assertEqual("gun", self.weapon.item_id)
-        self.assertEqual("weapon, gun, short, test", self.weapon.tags)
+        self.assertEqual("weapon, gun, short", self.weapon.tags)
         self.assertEqual("Gun", self.weapon.name)
         self.assertEqual("Test gun.", self.weapon.desc)
         self.assertEqual("2 + 4d6", self.weapon.damage)
@@ -140,23 +140,23 @@ class RangedWeaponTests(unittest.TestCase):
         self.assertTupleEqual((6, 26), damage_range)
 
     def test_damage_range_with_full_damage_formula_single_roll(self):
-        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                              damage="2 + d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
-                              st_requirement=1, value=10, weight=2.0)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="2 + d6",
+                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
+                              value=10, weight=2.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((3, 8), damage_range)
 
     def test_damage_range_with_multiple_rolls_only(self):
-        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                              damage="4d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
-                              st_requirement=1, value=10, weight=2.0)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="4d6",
+                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
+                              value=10, weight=2.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((4, 24), damage_range)
 
     def test_damage_range_with_single_roll_only(self):
-        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short, test", name="Gun", desc="Test gun.",
-                              damage="d6", ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10,
-                              st_requirement=1, value=10, weight=2.0)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="d6",
+                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
+                              value=10, weight=2.0)
         damage_range = weapon.get_dmg_range()
         self.assertTupleEqual((1, 6), damage_range)
 
@@ -173,7 +173,7 @@ class RangedWeaponTests(unittest.TestCase):
             self.weapon.current_ammo = -5
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: gun, tags: weapon, gun, short, test, name: Gun, description: Test gun.,\ndamage: "
+        correct_str_print = ("ID: gun, tags: weapon, gun, short, name: Gun, description: Test gun.,\ndamage: "
                              "2 + 4d6 (6 - 26), ammo: ammo (0 / 10), penetration: 0, accuracy: 0,\nAP: 10, "
                              "strength required: 1, value: 10, weight: 2.0")
         self.assertEqual(correct_str_print, self.weapon.__str__())
@@ -189,12 +189,12 @@ class StackableTests(unittest.TestCase):
 class AmmoTests(unittest.TestCase):
 
     def setUp(self):
-        self.ammo = Ammo(item_id="ammo", tags="ammo, stackable, test", name="Ammo", desc="Test ammo.",
+        self.ammo = Ammo(item_id="ammo", tags="ammo, stackable", name="Ammo", desc="Test ammo.",
                          max_stack=50, current_amount=30, value=1, weight=0.01)
 
     def test_property_values(self):
         self.assertEqual("ammo", self.ammo.item_id)
-        self.assertEqual("ammo, stackable, test", self.ammo.tags)
+        self.assertEqual("ammo, stackable", self.ammo.tags)
         self.assertEqual("Ammo", self.ammo.name)
         self.assertEqual("Test ammo.", self.ammo.desc)
         self.assertEqual(50, self.ammo.max_stack)
@@ -215,21 +215,21 @@ class AmmoTests(unittest.TestCase):
             self.ammo.current_amount = -5
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: ammo, tags: ammo, stackable, test, name: Ammo, description: Test ammo.,\namount: "
-                             "30 / 50, value: 1 (30), weight: 0.01 (0.3)")
+        correct_str_print = ("ID: ammo, tags: ammo, stackable, name: Ammo, description: Test ammo.,\namount: 30 / 50, "
+                             "value: 1 (30), weight: 0.01 (0.3)")
         self.assertEqual(correct_str_print, self.ammo.__str__())
 
 
 class ConsumableTests(unittest.TestCase):
 
     def setUp(self):
-        self.consumable = Consumable(item_id="consumable", tags="consumable, stackable, test", name="Consumable",
+        self.consumable = Consumable(item_id="consumable", tags="consumable, stackable", name="Consumable",
                                      desc="Test consumable.", effect="none", max_stack=5, current_amount=2, value=10,
                                      weight=0.5)
 
     def test_property_values(self):
         self.assertEqual("consumable", self.consumable.item_id)
-        self.assertEqual("consumable, stackable, test", self.consumable.tags)
+        self.assertEqual("consumable, stackable", self.consumable.tags)
         self.assertEqual("Consumable", self.consumable.name)
         self.assertEqual("Test consumable.", self.consumable.desc)
         self.assertEqual("none", self.consumable.effect)
@@ -251,7 +251,7 @@ class ConsumableTests(unittest.TestCase):
             self.consumable.current_amount = -5
 
     def test_obj_as_str_representation(self):
-        correct_str_print = ("ID: consumable, tags: consumable, stackable, test, name: Consumable, description: "
+        correct_str_print = ("ID: consumable, tags: consumable, stackable, name: Consumable, description: "
                              "Test consumable.,\neffect: none, amount: 2 / 5, value: 10 (20), weight: 0.5 (1.0)")
         self.assertEqual(correct_str_print, self.consumable.__str__())
 

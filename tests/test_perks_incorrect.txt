@@ -1,16 +1,16 @@
 # perks #
 
 id:           incorrect_perk
-tags:         speed, test
+tags:         ap_cost
 name:         Perk
 description:  Test perk.
-effects:      weapon, short, speed, 1
-requirements: attribute, agility, 6
+effects:      weapon, short, ap_cost, 1
+requirements: attribute, agility, 5
 
 # traits #
 
 id:           incorrect_trait
-tags:         trait, attribute, test
+tags:         trait, attribute
 name:         Trait
 description:  Test trait.
 conflicts:    conflicting_trait
@@ -18,13 +18,13 @@ conflicts:    conflicting_trait
 # status effects #
 
 id:           incorrect_status_effect
-tags:         status effect, evasion, test
+tags:         status effect, evasion
 name:         Status Effect
 description:  Test status effect.
 effects:      evasion, 1
 duration:     none
 
 id:           another_incorrect_status_effect
-tags:         status effect, evasion, test
+tags:         status effect, evasion
 name:         Status Effect
 description:  Test status effect.

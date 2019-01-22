@@ -17,7 +17,7 @@ class CritterFactoryTests(unittest.TestCase):
                                  perk_data_file="test_perks_correct.txt").create_critter(critter_id="critter")
         self.assertIsInstance(critter, Critter)
         self.assertEqual("Critter", critter.name)
-        self.assertEqual("critter, test", critter.tags)
+        self.assertEqual("critter, dog", critter.tags)
         self.assertEqual(1, critter.level)
         self.assertEqual(5, critter.strength)
         self.assertEqual(5, critter.endurance)
@@ -29,12 +29,12 @@ class CritterFactoryTests(unittest.TestCase):
         self.assertIsInstance(critter.inventory.equipped_armor, Armor)
         self.assertIsInstance(critter.inventory.equipped_weapon, MeleeWeapon)
 
-    def test_create_critter_with_no_perks(self):
+    def test_create_critter_without_perks(self):
         critter = CritterFactory(data_file="test_critters_correct.txt", item_data_file="test_items_correct.txt",
                                  perk_data_file="test_perks_correct.txt").create_critter(critter_id="another_critter")
         self.assertIsInstance(critter, Critter)
         self.assertEqual("Critter", critter.name)
-        self.assertEqual("critter, test", critter.tags)
+        self.assertEqual("critter, dog", critter.tags)
         self.assertEqual(1, critter.level)
         self.assertEqual(5, critter.strength)
         self.assertEqual(5, critter.endurance)

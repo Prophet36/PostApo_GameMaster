@@ -1,16 +1,16 @@
 # perks #
 
 id:           perk
-tags:         perk, ap_cost, test
+tags:         perk, ap_cost
 name:         Perk
 description:  Test perk.
 effects:      weapon, short, ap_cost, -1
-requirements: attribute, agility, 6
+requirements: attribute, agility, 5
 
 # traits #
 
 id:           trait
-tags:         trait, attribute, test
+tags:         trait, attribute
 name:         Trait
 description:  Test trait.
 effects:      attribute, strength, -1; attribute, agility, 1
@@ -19,7 +19,7 @@ conflicts:    conflicting_trait
 # status effects #
 
 id:           status_effect
-tags:         status effect, evasion, test
+tags:         status effect, evasion
 name:         Status Effect
 description:  Test status effect.
 effects:      evasion, 1

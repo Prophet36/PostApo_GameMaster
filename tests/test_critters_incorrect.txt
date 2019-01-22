@@ -1,7 +1,7 @@
 # critters #
 
 id:           critter_with_incorrect_armor
-tags:         perk, ap_cost, test
+tags:         critter, dog
 name:         Critter
 level:        1
 strength:     5
@@ -16,7 +16,7 @@ weapon:       melee
 perks:        perk, trait, status_effect
 
 id:           critter_with_incorrect_weapon
-tags:         perk, ap_cost, test
+tags:         critter, dog
 name:         Critter
 level:        1
 strength:     5
@@ -31,7 +31,7 @@ weapon:       incorrect_weapon
 perks:        perk, trait, status_effect
 
 id:           critter_with_incorrect_perk
-tags:         perk, ap_cost, test
+tags:         critter, dog
 name:         Critter
 level:        1
 strength:     5
@@ -46,7 +46,7 @@ weapon:       melee
 perks:        incorrect_perk
 
 id:           incorrect_critter
-tags:         perk, ap_cost, test
+tags:         critter, dog
 name:         Critter
 level:        one
 strength:     5
@@ -61,7 +61,7 @@ weapon:       melee
 perks:        perk, trait, status_effect
 
 id:           another_incorrect_critter
-tags:         perk, ap_cost, test
+tags:         critter, dog
 name:         Critter
 strength:     5
 endurance:    5
@@ -75,5 +75,5 @@ weapon:       melee
 perks:        perk, trait, status_effect
 
 id:           yet_another_incorrect_critter
-tags:         perk, ap_cost, test
+tags:         critter, dog
 name:         Critter

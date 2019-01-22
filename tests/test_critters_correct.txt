@@ -1,7 +1,7 @@
 # critters #
 
 id:           critter
-tags:         critter, test
+tags:         critter, dog
 name:         Critter
 level:        1
 strength:     5
@@ -16,7 +16,7 @@ weapon:       melee
 perks:        perk, trait, status_effect
 
 id:           another_critter
-tags:         critter, test
+tags:         critter, dog
 name:         Critter
 level:        1
 strength:     5

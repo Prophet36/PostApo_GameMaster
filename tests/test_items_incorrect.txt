@@ -1,7 +1,7 @@
 # armor #
 
 id:                    incorrect_armor
-tags:                  test
+tags:                  clothing
 name:                  Armor
 description:           Test armor.
 damage_resistance:     0
@@ -13,7 +13,7 @@ weight:                2.5
 # weapons - melee #
 
 id:                    incorrect_melee
-tags:                  weapon, melee, sharp, test
+tags:                  weapon, melee, sharp
 name:                  Melee
 description:           Test melee.
 damage:                2 + 4d6
@@ -29,7 +29,7 @@ weight:                1.0
 # weapons - guns #
 
 id:                    incorrect_gun
-tags:                  weapon, gun, short, test
+tags:                  weapon, gun, short
 name:                  Gun
 description:           Test gun.
 damage:                2 + 4d6
@@ -44,7 +44,7 @@ weight:                2.0
 # weapons - energy
 
 id:                    incorrect_laser
-tags:                  weapon, energy, laser, short, test
+tags:                  weapon, energy, short, laser
 name:                  Laser
 description:           Test laser.
 damage:                2 + 4d6
