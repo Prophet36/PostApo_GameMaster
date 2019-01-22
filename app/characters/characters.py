@@ -109,6 +109,14 @@ class Character(ABC):
         """
         return self._health
 
+    @health.setter
+    def health(self, value):
+        """Sets character's current health to provided value.
+
+        :param value: value to set character's current health to
+        """
+        self._health = value
+
     @property
     def health_bonus(self):
         """Gets character's bonus to max health.
@@ -124,6 +132,14 @@ class Character(ABC):
         :return: character's current action points
         """
         return self._action_points
+
+    @action_points.setter
+    def action_points(self, value):
+        """Sets character's current action points to provided value.
+
+        :param value: value to set character's current action points to
+        """
+        self._action_points = value
 
     @property
     def inventory(self):
@@ -186,6 +202,14 @@ class Human(Character):
         """
         return self._guns
 
+    @guns.setter
+    def guns(self, value):
+        """Sets character's guns skill to provided value.
+
+        :param value: value to set character's guns skill to
+        """
+        self._guns = value
+
     @property
     def energy(self):
         """Gets character's energy weapons skill proficiency.
@@ -193,6 +217,14 @@ class Human(Character):
         :return: character's energy weapons skill
         """
         return self._energy
+
+    @energy.setter
+    def energy(self, value):
+        """Sets character's energy weapons skill to provided value.
+
+        :param value: value to set character's energy weapons skill to
+        """
+        self._energy = value
 
     @property
     def melee(self):
@@ -202,6 +234,14 @@ class Human(Character):
         """
         return self._melee
 
+    @melee.setter
+    def melee(self, value):
+        """Sets character's melee weapons skill to provided value.
+
+        :param value: value to set character's melee weapons skill to
+        """
+        self._melee = value
+
     @property
     def sneak(self):
         """Gets character's sneak skill proficiency.
@@ -209,6 +249,14 @@ class Human(Character):
         :return: character's sneak skill
         """
         return self._sneak
+
+    @sneak.setter
+    def sneak(self, value):
+        """Sets character's sneak skill to provided value.
+
+        :param value: value to set character's sneak skill to
+        """
+        self._sneak = value
 
     @property
     def security(self):
@@ -218,6 +266,14 @@ class Human(Character):
         """
         return self._security
 
+    @security.setter
+    def security(self, value):
+        """Sets character's security skill to provided value.
+
+        :param value: value to set character's security skill to
+        """
+        self._security = value
+
     @property
     def mechanics(self):
         """Gets character's mechanics (mechanical knowledge, repairing) skill proficiency.
@@ -225,6 +281,14 @@ class Human(Character):
         :return: character's mechanics skill
         """
         return self._mechanics
+
+    @mechanics.setter
+    def mechanics(self, value):
+        """Sets character's mechanics skill to provided value.
+
+        :param value: value to set character's mechanics skill to
+        """
+        self._mechanics = value
 
     @property
     def survival(self):
@@ -234,6 +298,14 @@ class Human(Character):
         """
         return self._survival
 
+    @survival.setter
+    def survival(self, value):
+        """Sets character's survival skill to provided value.
+
+        :param value: value to set character's survival skill to
+        """
+        self._survival = value
+
     @property
     def medicine(self):
         """Gets character's medicine skill proficiency.
@@ -241,6 +313,14 @@ class Human(Character):
         :return: character's medicine skill
         """
         return self._medicine
+
+    @medicine.setter
+    def medicine(self, value):
+        """Sets character's medicine skill to provided value.
+
+        :param value: value to set character's medicine skill to
+        """
+        self._medicine = value
 
 
 class Player(Human):

@@ -1,9 +1,10 @@
-from app.characters.characters import Character
+from app.characters.characters import Character, Critter
+from app.items.weapons import MeleeWeapon, RangedWeapon
 from app.perks.perks import Perk
 
 
 class CombatCalculatorError(Exception):
-    """This exception class exist to unify all errors and exceptions occurring during combat calculations."""
+    """This exception class exist to unify all errors and exceptions occurring during combat parameters calculations."""
     pass
 
 
@@ -22,7 +23,7 @@ class DamageCalculator:
         :param character: Character derived object to calculate damage for
         :param opponent: Character derived object to calculate damage against
         :raises CombatCalculatorError: when specified characters, or their equipped weapons are incorrect
-        :return:
+        :return: effective potential damage
         """
         if not isinstance(character, Character):
             raise CombatCalculatorError("incorrect object type for character")
@@ -31,8 +32,8 @@ class DamageCalculator:
         if character.inventory.equipped_weapon is None:
             raise CombatCalculatorError("no weapon equipped on character: {}".format(character.name))
         base_damage = DamageCalculator._get_base_weapon_damage(character=character)
-        base_damage += DamageCalculator._get_weapon_type_damage_bonus(character=character)
-        base_damage += DamageCalculator._get_opponent_type_damage_bonus(character=character, opponent=opponent)
+        base_damage += DamageCalculator._get_weapon_type_perk_damage_bonus(character=character)
+        base_damage += DamageCalculator._get_opponent_type_perk_damage_bonus(character=character, opponent=opponent)
         effective_damage = DamageCalculator._get_effective_damage(character=character,
                                                                   effective_base_damage=base_damage)
         return effective_damage
@@ -52,7 +53,7 @@ class DamageCalculator:
         return base_damage
 
     @staticmethod
-    def _get_weapon_type_damage_bonus(character):
+    def _get_weapon_type_perk_damage_bonus(character):
         """Calculates bonus damage provided by perks based on type of equipped weapon.
 
         :param character: Character derived object to calculate bonus damage for
@@ -68,7 +69,7 @@ class DamageCalculator:
         return bonus_damage
 
     @staticmethod
-    def _get_opponent_type_damage_bonus(character, opponent):
+    def _get_opponent_type_perk_damage_bonus(character, opponent):
         """Calculates bonus damage provided by perks based on type of opponent.
 
         :param character: Character derived object to calculate bonus damage for
@@ -86,7 +87,7 @@ class DamageCalculator:
 
     @staticmethod
     def _get_perk_damage_bonus(perk, tags):
-        """Gets bonus damage provided by provided perk based on matching tags.
+        """Gets bonus damage gained by provided perk based on matching tags.
 
         Bonus is provided when set of tags from perk's effects are a subset of provided tags (for example, weapon tags).
 
@@ -221,3 +222,164 @@ class DamageFormulaCalculator:
         max_damage = damage_tuple[0] + damage_tuple[1] * damage_tuple[2]
         damage_range = (min_damage, max_damage)
         return damage_range
+
+
+class AccuracyCalculator:
+    """This class calculates effective accuracy (from weapon, stats and modified by perks) the character has when
+    attacking his opponent.
+
+    The class uses CombatCalculatorError exception, which is raised when specified characters, or their weapons or perks
+    are incorrect.
+    """
+
+    @staticmethod
+    def get_weapon_accuracy(character, opponent):
+        """Calculates effective accuracy based on equipped weapon and active perks.
+
+        :param character: Character derived object to calculate accuracy for
+        :param opponent: Character derived object to calculate accuracy against
+        :raises CombatCalculatorError: when specified characters, or their equipped weapons are incorrect
+        :return: effective accuracy
+        """
+        if not isinstance(character, Character):
+            raise CombatCalculatorError("incorrect object type for character")
+        if not isinstance(opponent, Character):
+            raise CombatCalculatorError("incorrect object type for opponent")
+        if character.inventory.equipped_weapon is None:
+            raise CombatCalculatorError("no weapon equipped on character: {}".format(character.name))
+        accuracy = AccuracyCalculator._get_weapon_accuracy(character=character)
+        accuracy += AccuracyCalculator._get_character_stat_accuracy(character=character)
+        accuracy += AccuracyCalculator._get_weapon_type_perk_accuracy_bonus(character=character)
+        accuracy += AccuracyCalculator._get_opponent_type_perk_accuracy_bonus(character=character, opponent=opponent)
+        return accuracy
+
+    @staticmethod
+    def _get_weapon_accuracy(character):
+        """Gets weapon inherent accuracy.
+
+        :param character: Character derived object to get equipped weapon's accuracy from
+        :return: weapon accuracy
+        """
+        accuracy = character.inventory.equipped_weapon.accuracy
+        return accuracy
+
+    @staticmethod
+    def _get_character_stat_accuracy(character):
+        """Gets accuracy from character's stats (attribute and respective skill).
+
+        :param character: Character derived object to get stats for
+        :raises CombatCalculatorError: when equipped weapon is incorrect
+        :return: accuracy based on character's stats
+        """
+        weapon = character.inventory.equipped_weapon
+        if isinstance(character, Critter):
+            return AccuracyCalculator._get_critter_accuracy(critter=character)
+        if isinstance(weapon, MeleeWeapon):
+            return AccuracyCalculator._get_melee_accuracy(character=character)
+        elif isinstance(weapon, RangedWeapon):
+            if "gun" in weapon.tags:
+                return AccuracyCalculator._get_guns_accuracy(character=character)
+            elif "energy" in weapon.tags:
+                return AccuracyCalculator._get_energy_accuracy(character=character)
+            else:
+                raise CombatCalculatorError("incorrect weapon type: {} for character: {}".format(weapon.name,
+                                                                                                 character.name))
+        else:
+            raise CombatCalculatorError("incorrect object type for weapon for character: {}".format(character.name))
+
+    @staticmethod
+    def _get_critter_accuracy(critter):
+        """Gets accuracy based on critter's stats.
+
+        Critters don't have skills, so their accuracy depends solely on attributes.
+
+        :param critter: Critter object to get stats for
+        :return: accuracy based on critter's stats
+        """
+        accuracy = critter.perception
+        return accuracy
+
+    @staticmethod
+    def _get_melee_accuracy(character):
+        """Gets accuracy for melee weapons based on character's stats.
+
+        :param character: Character derived object to get stats for
+        :return: accuracy based on character's stats
+        """
+        accuracy = character.perception + character.melee
+        return accuracy
+
+    @staticmethod
+    def _get_guns_accuracy(character):
+        """Gets accuracy for guns based on character's stats.
+
+        :param character: Character derived object to get stats for
+        :return: accuracy based on character's stats
+        """
+        accuracy = character.perception + character.guns
+        return accuracy
+
+    @staticmethod
+    def _get_energy_accuracy(character):
+        """Gets accuracy for energy weapons based on character's stats.
+
+        :param character: Character derived object to get stats for
+        :return: accuracy based on character's stats
+        """
+        accuracy = character.perception + character.energy
+        return accuracy
+
+    @staticmethod
+    def _get_weapon_type_perk_accuracy_bonus(character):
+        """Calculates bonus accuracy provided by perks based on type of equipped weapon.
+
+        :param character: Character derived object to calculate bonus accuracy for
+        :return: bonus accuracy based on weapon type
+        """
+        bonus_accuracy = 0
+        weapon_tags = character.inventory.equipped_weapon.tags
+        for perk in character.perks.perks:
+            if not isinstance(perk, Perk):
+                raise CombatCalculatorError("incorrect object type for perk")
+            if "accuracy" in perk.tags:
+                bonus_accuracy += AccuracyCalculator._get_perk_accuracy_bonus(perk=perk, tags=weapon_tags)
+        return bonus_accuracy
+
+    @staticmethod
+    def _get_opponent_type_perk_accuracy_bonus(character, opponent):
+        """Calculates bonus accuracy provided by perks based on type of opponent.
+
+        :param character: Character derived object to calculate bonus accuracy for
+        :param opponent: Character derived object to calculate bonus accuracy against
+        :return: bonus accuracy based on opponent type
+        """
+        bonus_accuracy = 0
+        opponent_tags = opponent.tags
+        for perk in character.perks.perks:
+            if not isinstance(perk, Perk):
+                raise CombatCalculatorError("incorrect object type for perk")
+            if "accuracy" in perk.tags:
+                bonus_accuracy += AccuracyCalculator._get_perk_accuracy_bonus(perk=perk, tags=opponent_tags)
+        return bonus_accuracy
+
+    @staticmethod
+    def _get_perk_accuracy_bonus(perk, tags):
+        """Gets bonus accuracy gained by provided perk based on matching tags.
+
+        Bonus is provided when set of tags from perk's effects are a subset of provided tags (for example, weapon tags).
+
+        :param perk: Perk derived object to get bonus accuracy from
+        :param tags: tags to compare set of tags from perk effects to
+        :return: bonus accuracy based on perks with qualifying effects
+        """
+        bonus_accuracy = 0
+        tags = tags.split(", ")
+        effects = perk.get_effects_list()
+        for effect in effects:
+            effect = effect.split(", ")
+            effect.remove("accuracy")
+            effect_value = int(effect[-1])
+            effect.pop(-1)
+            if len(effect) > 0 and set(effect) <= set(tags):
+                bonus_accuracy += effect_value
+        return bonus_accuracy

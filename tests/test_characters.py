@@ -44,6 +44,28 @@ class HumanTests(unittest.TestCase):
         self.assertIsInstance(self.human.inventory, Inventory)
         self.assertIsInstance(self.human.perks, PerkInventory)
 
+    def test_setters(self):
+        self.human.guns = 5
+        self.human.energy = 5
+        self.human.melee = 5
+        self.human.sneak = 5
+        self.human.security = 5
+        self.human.mechanics = 5
+        self.human.survival = 5
+        self.human.medicine = 5
+        self.human.health = 10
+        self.human.action_points = 15
+        self.assertEqual(5, self.human.guns)
+        self.assertEqual(5, self.human.energy)
+        self.assertEqual(5, self.human.melee)
+        self.assertEqual(5, self.human.sneak)
+        self.assertEqual(5, self.human.security)
+        self.assertEqual(5, self.human.mechanics)
+        self.assertEqual(5, self.human.survival)
+        self.assertEqual(5, self.human.medicine)
+        self.assertEqual(10, self.human.health)
+        self.assertEqual(15, self.human.action_points)
+
     def test_obj_as_str_representation(self):
         correct_str_print = ("name: Human, tags: human, level: 1,\nstrength: 5, endurance: 5, agility: 5, "
                              "perception: 5, intelligence: 5,\nguns: 1, energy weapons: 1, melee weapons: 1,\n"
@@ -82,6 +104,28 @@ class PlayerTests(unittest.TestCase):
         self.assertIsInstance(self.player.inventory, Inventory)
         self.assertIsInstance(self.player.perks, PerkInventory)
 
+    def test_setters(self):
+        self.player.guns = 5
+        self.player.energy = 5
+        self.player.melee = 5
+        self.player.sneak = 5
+        self.player.security = 5
+        self.player.mechanics = 5
+        self.player.survival = 5
+        self.player.medicine = 5
+        self.player.health = 10
+        self.player.action_points = 15
+        self.assertEqual(5, self.player.guns)
+        self.assertEqual(5, self.player.energy)
+        self.assertEqual(5, self.player.melee)
+        self.assertEqual(5, self.player.sneak)
+        self.assertEqual(5, self.player.security)
+        self.assertEqual(5, self.player.mechanics)
+        self.assertEqual(5, self.player.survival)
+        self.assertEqual(5, self.player.medicine)
+        self.assertEqual(10, self.player.health)
+        self.assertEqual(15, self.player.action_points)
+
     def test_obj_as_str_representation(self):
         correct_str_print = ("name: Player, tags: human, player, level: 1, experience: 500,\nstrength: 5, "
                              "endurance: 5, agility: 5, perception: 5, intelligence: 5,\nguns: 1, energy weapons: 1, "
@@ -110,6 +154,12 @@ class CritterTests(unittest.TestCase):
         self.assertEqual(10, self.critter.experience_award)
         self.assertIsInstance(self.critter.inventory, Inventory)
         self.assertIsInstance(self.critter.perks, PerkInventory)
+
+    def test_setters(self):
+        self.critter.health = 10
+        self.critter.action_points = 15
+        self.assertEqual(10, self.critter.health)
+        self.assertEqual(15, self.critter.action_points)
 
     def test_obj_as_str_representation(self):
         correct_str_print = ("name: Critter, tags: critter, level: 1,\nstrength: 5, endurance: 5, agility: 5, "
