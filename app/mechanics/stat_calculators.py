@@ -308,7 +308,7 @@ class CharacterDerivedStatCalculator:
         CharacterDerivedStatCalculator._check_valid_character(character)
         strength = CharacterAttributeCalculator.get_strength(character)
         carry_weight = get_carry_weight_base() + get_carry_weight_strength_mult() * strength
-        carry_weight += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="carry_weight")
+        carry_weight += PerkDerivedStatCalculator.get_stat_bonus(perk_inv=character.perks, stat="carry_wg")
         return carry_weight
 
     @staticmethod
