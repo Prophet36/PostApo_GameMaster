@@ -1,4 +1,5 @@
 from app.characters.characters import Character, Critter
+from app.mechanics.stat_calculators import CharacterDerivedStatCalculator
 from app.items.weapons import MeleeWeapon, RangedWeapon
 from app.perks.perks import Perk
 
@@ -135,6 +136,8 @@ class DamageCalculator:
             raise CombatCalculatorError("incorrect object type for character")
         if opponent is not None and not isinstance(opponent, Character):
             raise CombatCalculatorError("incorrect object type for opponent")
+        if character is opponent:
+            raise CombatCalculatorError("character and opponent are the same object")
         if character.inventory.equipped_weapon is None:
             raise CombatCalculatorError("no weapon equipped on character: {}".format(character.name))
         base_damage = DamageCalculator._get_base_weapon_damage(character=character)
@@ -253,6 +256,8 @@ class AccuracyCalculator:
             raise CombatCalculatorError("incorrect object type for character")
         if opponent is not None and not isinstance(opponent, Character):
             raise CombatCalculatorError("incorrect object type for opponent")
+        if character is opponent:
+            raise CombatCalculatorError("character and opponent are the same object")
         if character.inventory.equipped_weapon is None:
             raise CombatCalculatorError("no weapon equipped on character: {}".format(character.name))
         effective_accuracy = AccuracyCalculator._get_weapon_accuracy(character=character)
@@ -397,6 +402,35 @@ class AccuracyCalculator:
         return bonus_accuracy
 
 
+class EffectiveAccuracyCalculator:
+    """This class calculates effective accuracy a character has against a specific opponents (by taking into account all
+    bonuses / maluses provided by equipment and perks for both parties).
+
+    The class uses CombatCalculatorError exception, which is raised when specified characters are incorrect.
+    """
+
+    @staticmethod
+    def get_effective_accuracy(character, opponent):
+        """Calculates effective accuracy provided character has against specified opponent by calculating character's
+        accuracy against opponent's evasion"
+
+        :param character: Character derived object to calculate effective accuracy for
+        :param opponent: Character derived object to calculate effective evasion for
+        :raises CombatCalculatorError: when specified characters are incorrect
+        :return: character's effective accuracy against specified opponent
+        """
+        if not isinstance(character, Character):
+            raise CombatCalculatorError("incorrect object type for character")
+        if not isinstance(opponent, Character):
+            raise CombatCalculatorError("incorrect object type for opponent")
+        if character is opponent:
+            raise CombatCalculatorError("character and opponent are the same object")
+        character_accuracy = AccuracyCalculator.get_weapon_accuracy(character=character, opponent=opponent)
+        opponent_evasion = CharacterDerivedStatCalculator.get_evasion(character=opponent)
+        effective_accuracy = character_accuracy - opponent_evasion
+        return effective_accuracy if effective_accuracy > 1 else 1
+
+
 class DamageResistanceCalculator:
     """This class calculates effective damage resistance (base armor and modified by perks) character has (with option
     to calculate damage resistance against specific opponent).
@@ -420,6 +454,8 @@ class DamageResistanceCalculator:
             raise CombatCalculatorError("incorrect object type for character")
         if opponent is not None and not isinstance(opponent, Character):
             raise CombatCalculatorError("incorrect object type for opponent")
+        if character is opponent:
+            raise CombatCalculatorError("character and opponent are the same object")
         if character.inventory.equipped_armor is None:
             raise CombatCalculatorError("no armor equipped on character: {}".format(character.name))
         effective_dmg_res = DamageResistanceCalculator._get_armor_dmg_res(character=character)

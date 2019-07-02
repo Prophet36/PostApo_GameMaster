@@ -4,7 +4,8 @@ from app.characters.characters import Human, Critter
 from app.items.items import Armor
 from app.items.weapons import RangedWeapon, MeleeWeapon
 from app.mechanics.combat_calculators import CombatCalculatorError, DamageCalculator, DamageFormulaConverter
-from app.mechanics.combat_calculators import AccuracyCalculator, DamageResistanceCalculator, APCostCalculator
+from app.mechanics.combat_calculators import AccuracyCalculator, EffectiveAccuracyCalculator
+from app.mechanics.combat_calculators import DamageResistanceCalculator, APCostCalculator
 from app.mechanics.inventory import InventoryItemAdder, InventoryItemEquipper, InventoryItemUnequipper
 from app.mechanics.perk_inventory import PerkInventoryPerkAdder
 from app.perks.perks import CharacterPerk
@@ -70,7 +71,7 @@ class DamageFormulaConverterTests(unittest.TestCase):
 class DamageCalculatorTests(unittest.TestCase):
 
     def setUp(self):
-        self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
+        self.character = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5)
         self.critter = Critter(name="Critter", tags="critter, dog", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5, health_bonus=10, exp_award=10)
@@ -113,6 +114,10 @@ class DamageCalculatorTests(unittest.TestCase):
         with self.assertRaisesRegex(CombatCalculatorError, "no weapon equipped on character: .*"):
             DamageCalculator.get_weapon_damage(character=self.character)
 
+    def test_same_obj_as_character_and_opponent_raises_exception(self):
+        with self.assertRaisesRegex(CombatCalculatorError, "character and opponent are the same object"):
+            DamageCalculator.get_weapon_damage(character=self.character, opponent=self.character)
+
     def test_incorrect_obj_as_character_raises_exception(self):
         with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for character"):
             DamageCalculator.get_weapon_damage(character="not Character derived object")
@@ -123,7 +128,7 @@ class DamageCalculatorTests(unittest.TestCase):
 class AccuracyCalculatorTests(unittest.TestCase):
 
     def setUp(self):
-        self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
+        self.character = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5)
         self.critter = Critter(name="Critter", tags="critter, dog", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5, health_bonus=10, exp_award=10)
@@ -249,6 +254,10 @@ class AccuracyCalculatorTests(unittest.TestCase):
         with self.assertRaisesRegex(CombatCalculatorError, "no weapon equipped on character: .*"):
             AccuracyCalculator.get_weapon_accuracy(character=self.character)
 
+    def test_same_obj_as_character_and_opponent_raises_exception(self):
+        with self.assertRaisesRegex(CombatCalculatorError, "character and opponent are the same object"):
+            AccuracyCalculator.get_weapon_accuracy(character=self.character, opponent=self.character)
+
     def test_incorrect_obj_as_character_raises_exception(self):
         with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for character"):
             AccuracyCalculator.get_weapon_accuracy(character="not Character derived object")
@@ -256,10 +265,100 @@ class AccuracyCalculatorTests(unittest.TestCase):
             AccuracyCalculator.get_weapon_accuracy(character=self.character, opponent="not Character derived object")
 
 
+class EffectiveAccuracyCalculatorTests(unittest.TestCase):
+
+    def setUp(self):
+        self.character = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5,
+                               perception=5, intelligence=5)
+        self.opponent = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5,
+                              perception=5, intelligence=5)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="2 + 4d6",
+                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=2, ap_cost=10, st_requirement=1,
+                              value=10, weight=2.0)
+        armor = Armor(item_id="armor", tags="armor", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=0, value=10, weight=2.5)
+        InventoryItemAdder.add_item(inv=self.character.inventory, item_to_add=weapon)
+        InventoryItemEquipper.equip_item(inv=self.character.inventory, item_to_equip=self.character.inventory.items[0])
+        InventoryItemAdder.add_item(inv=self.opponent.inventory, item_to_add=armor)
+        InventoryItemEquipper.equip_item(inv=self.opponent.inventory, item_to_equip=self.opponent.inventory.items[0])
+        self.character.guns = 5
+
+    def test_base_accuracy_against_opponent(self):
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(12, accuracy)
+
+    def test_accuracy_with_weapon_type_accuracy_perk_against_opponent(self):
+        perk = CharacterPerk(perk_id="perk", tags="perk, accuracy", name="Perk", desc="Test perk.",
+                             effects="weapon, gun, short, accuracy, 1", requirements="agility, 5")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=perk)
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(13, accuracy)
+
+    def test_accuracy_with_opponent_type_accuracy_perk_against_opponent(self):
+        perk = CharacterPerk(perk_id="perk", tags="perk, accuracy", name="Perk", desc="Test perk.",
+                             effects="human, accuracy, 2", requirements="agility, 5")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=perk)
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(14, accuracy)
+
+    def test_accuracy_against_opponent_with_armor_evasion_bonus(self):
+        armor = Armor(item_id="armor", tags="armor", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        InventoryItemAdder.add_item(inv=self.opponent.inventory, item_to_add=armor)
+        InventoryItemEquipper.equip_item(inv=self.opponent.inventory, item_to_equip=self.opponent.inventory.items[0])
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(10, accuracy)
+
+    def test_accuracy_against_opponent_with_evasion_perk(self):
+        perk = CharacterPerk(perk_id="perk", tags="perk, evasion", name="Perk", desc="Test perk.",
+                             effects="evasion, 1", requirements="agility, 5")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.opponent.perks, perk_to_add=perk)
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(11, accuracy)
+
+    def test_accuracy_with_perks_against_opponent_with_perk_and_armor_evasion_bonus(self):
+        weapon_type_perk = CharacterPerk(perk_id="perk", tags="perk, accuracy", name="Perk", desc="Test perk.",
+                                         effects="weapon, gun, short, accuracy, 1", requirements="agility, 5")
+        opponent_type_perk = CharacterPerk(perk_id="another_perk", tags="perk, accuracy", name="Perk",
+                                           desc="Test perk.", effects="human, accuracy, 2", requirements="agility, 5")
+        opponent_evasion_perk = CharacterPerk(perk_id="perk", tags="perk, evasion", name="Perk", desc="Test perk.",
+                                              effects="evasion, 1", requirements="agility, 5")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=weapon_type_perk)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=opponent_type_perk)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.opponent.perks, perk_to_add=opponent_evasion_perk)
+        armor = Armor(item_id="armor", tags="armor", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=2, value=10, weight=2.5)
+        InventoryItemAdder.add_item(inv=self.opponent.inventory, item_to_add=armor)
+        InventoryItemEquipper.equip_item(inv=self.opponent.inventory, item_to_equip=self.opponent.inventory.items[0])
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(12, accuracy)
+
+    def test_minimum_accuracy_against_opponent(self):
+        self.character.guns = 0
+        armor = Armor(item_id="armor", tags="armor", name="Armor", desc="Test armor.", dmg_res=0, rad_res=10,
+                      evasion=20, value=10, weight=2.5)
+        InventoryItemAdder.add_item(inv=self.opponent.inventory, item_to_add=armor)
+        InventoryItemEquipper.equip_item(inv=self.opponent.inventory, item_to_equip=self.opponent.inventory.items[0])
+        accuracy = EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.opponent)
+        self.assertEqual(1, accuracy)
+
+    def test_same_obj_as_character_and_opponent_raises_exception(self):
+        with self.assertRaisesRegex(CombatCalculatorError, "character and opponent are the same object"):
+            EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character, opponent=self.character)
+
+    def test_incorrect_obj_as_character_raises_exception(self):
+        with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for character"):
+            EffectiveAccuracyCalculator.get_effective_accuracy(character="not Character derived object",
+                                                               opponent=self.opponent)
+        with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for opponent"):
+            EffectiveAccuracyCalculator.get_effective_accuracy(character=self.character,
+                                                               opponent="not Character derived object")
+
+
 class DamageResistanceCalculatorTests(unittest.TestCase):
 
     def setUp(self):
-        self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
+        self.character = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5)
         self.critter = Critter(name="Critter", tags="critter, dog", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5, health_bonus=10, exp_award=10)
@@ -306,6 +405,10 @@ class DamageResistanceCalculatorTests(unittest.TestCase):
         with self.assertRaisesRegex(CombatCalculatorError, "no armor equipped on character: .*"):
             DamageResistanceCalculator.get_damage_resistance(character=self.character)
 
+    def test_same_obj_as_character_and_opponent_raises_exception(self):
+        with self.assertRaisesRegex(CombatCalculatorError, "character and opponent are the same object"):
+            DamageResistanceCalculator.get_damage_resistance(character=self.character, opponent=self.character)
+
     def test_incorrect_obj_as_character_raises_exception(self):
         with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for character"):
             DamageResistanceCalculator.get_damage_resistance(character="not Character derived object")
@@ -317,7 +420,7 @@ class DamageResistanceCalculatorTests(unittest.TestCase):
 class APCostCalculatorTests(unittest.TestCase):
 
     def setUp(self):
-        self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
+        self.character = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5)
         self.critter = Critter(name="Critter", tags="critter, dog", level=1, strength=5, endurance=5, agility=5,
                                perception=5, intelligence=5, health_bonus=10, exp_award=10)
