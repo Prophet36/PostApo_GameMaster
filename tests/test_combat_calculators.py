@@ -10,7 +10,7 @@ from app.mechanics.perk_inventory import PerkInventoryPerkAdder
 from app.perks.perks import CharacterPerk
 
 
-class TestDamageFormulaConverter(unittest.TestCase):
+class DamageFormulaConverterTests(unittest.TestCase):
 
     def test_get_damage_tuple_with_full_damage_formula_multiple_rolls(self):
         damage_formula = "2 + 4d6"
@@ -67,7 +67,7 @@ class TestDamageFormulaConverter(unittest.TestCase):
             DamageFormulaConverter.get_damage_range(damage_formula=2)
 
 
-class TestDamageCalculator(unittest.TestCase):
+class DamageCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
@@ -120,7 +120,7 @@ class TestDamageCalculator(unittest.TestCase):
             DamageCalculator.get_weapon_damage(character=self.character, opponent="not Character derived object")
 
 
-class TestAccuracyCalculator(unittest.TestCase):
+class AccuracyCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
@@ -256,7 +256,7 @@ class TestAccuracyCalculator(unittest.TestCase):
             AccuracyCalculator.get_weapon_accuracy(character=self.character, opponent="not Character derived object")
 
 
-class TestDamageResistanceCalculator(unittest.TestCase):
+class DamageResistanceCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
@@ -314,7 +314,7 @@ class TestDamageResistanceCalculator(unittest.TestCase):
                                                              opponent="not Character derived object")
 
 
-class TestAPCostCalculator(unittest.TestCase):
+class APCostCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,

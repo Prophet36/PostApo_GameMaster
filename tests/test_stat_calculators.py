@@ -9,7 +9,7 @@ from app.mechanics.stat_calculators import StatCalculatorError
 from app.perks.perks import PlayerTrait, StatusEffect
 
 
-class TestPerkAttributeCalculator(unittest.TestCase):
+class PerkAttributeCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
@@ -45,7 +45,7 @@ class TestPerkAttributeCalculator(unittest.TestCase):
             PerkAttributeCalculator.get_attribute_bonus(perk_inv="not PerkInventory object", attribute="strength")
 
 
-class TestPerkSkillCalculator(unittest.TestCase):
+class PerkSkillCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
@@ -81,7 +81,7 @@ class TestPerkSkillCalculator(unittest.TestCase):
             PerkSkillCalculator.get_skill_bonus(perk_inv="not PerkInventory object", skill="guns")
 
 
-class TestPerkDerivedStatCalculator(unittest.TestCase):
+class PerkDerivedStatCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
@@ -119,7 +119,7 @@ class TestPerkDerivedStatCalculator(unittest.TestCase):
             PerkDerivedStatCalculator.get_stat_bonus(perk_inv="not PerkInventory object", stat="evasion")
 
 
-class TestCharacterAttributeCalculator(unittest.TestCase):
+class CharacterAttributeCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
@@ -144,7 +144,7 @@ class TestCharacterAttributeCalculator(unittest.TestCase):
             CharacterAttributeCalculator.get_strength(character="not Character derived object")
 
 
-class TestCharacterSkillCalculator(unittest.TestCase):
+class CharacterSkillCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
@@ -172,7 +172,7 @@ class TestCharacterSkillCalculator(unittest.TestCase):
             CharacterSkillCalculator.get_guns(character="not Character derived object")
 
 
-class TestCharacterDerivedStatCalculator(unittest.TestCase):
+class CharacterDerivedStatCalculatorTests(unittest.TestCase):
 
     def setUp(self):
         self.human = Human(name="Human", tags="human", level=1, strength=5, endurance=5, agility=5, perception=5,
