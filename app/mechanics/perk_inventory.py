@@ -130,3 +130,25 @@ class PerkInventoryStatusEffectDurationLowerer:
         for perk in perk_inv.perks:
             if isinstance(perk, StatusEffect):
                 perk.lower_duration()
+
+
+class PerkInventoryExpiredStatusEffectRemover:
+    """This class removes expired status effects in specified perk inventory.
+
+    The class uses PerkInventory class' PerkInventoryError exception, which is raised when specified perk inventory is
+    incorrect.
+    """
+
+    @staticmethod
+    def remove_expired_status_effects(perk_inv):
+        """Removes expired status effects in specified perk inventory.
+
+        :param perk_inv: PerkInventory object to remove expired status effects from
+        :raises PerkInventoryError: when specified perk inventory is incorrect
+        """
+        if not isinstance(perk_inv, PerkInventory):
+            raise PerkInventory.PerkInventoryError("incorrect object type for perk inventory")
+        for perk in perk_inv.perks:
+            if isinstance(perk, StatusEffect) and perk.duration == 0:
+                PerkInventoryPerkRemover.remove_perk(perk_inv=perk_inv, perk_to_remove=perk)
+

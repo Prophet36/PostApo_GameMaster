@@ -2,6 +2,7 @@ import unittest
 
 from app.mechanics.perk_inventory import PerkInventory, PerkInventoryPerkAdder, PerkInventoryPerkRemover
 from app.mechanics.perk_inventory import PerkInventoryStatusEffectDurationLowerer
+from app.mechanics.perk_inventory import PerkInventoryExpiredStatusEffectRemover
 from app.perks.perks import CharacterPerk, StatusEffect, PlayerTrait
 
 
@@ -118,6 +119,44 @@ class PerkInventoryStatusEffectDurationLowererTests(unittest.TestCase):
     def test_incorrect_obj_as_perk_inventory_raises_exception(self):
         with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
             PerkInventoryStatusEffectDurationLowerer.lower_status_effects_duration(perk_inv="not PerkInventory object")
+
+
+class PerkInventoryExpiredStatusEffectRemoverTests(unittest.TestCase):
+
+    def setUp(self):
+        self.perk_inventory = PerkInventory()
+        status_effect = StatusEffect(perk_id="status_effect", tags="status effect, evasion", name="Status Effect",
+                                     desc="Test status effect.", effects="evasion, 1", duration=1)
+        another_status_effect = StatusEffect(perk_id="another_status_effect", tags="status effect, evasion",
+                                             name="Status Effect", desc="Test status effect.", effects="evasion, 1",
+                                             duration=2)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=status_effect)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=another_status_effect)
+
+    def test_status_effects_duration_lowered_to_zero_removes_status_effect(self):
+        self.assertEqual(1, self.perk_inventory.perks[0].duration)
+        self.assertEqual(2, self.perk_inventory.perks[1].duration)
+        PerkInventoryStatusEffectDurationLowerer.lower_status_effects_duration(perk_inv=self.perk_inventory)
+        self.assertEqual(0, self.perk_inventory.perks[0].duration)
+        self.assertEqual(1, self.perk_inventory.perks[1].duration)
+        self.assertEqual(2, len(self.perk_inventory.perks))
+        PerkInventoryExpiredStatusEffectRemover.remove_expired_status_effects(perk_inv=self.perk_inventory)
+        self.assertEqual(1, len(self.perk_inventory.perks))
+
+    def test_permanent_status_effect_is_not_removed(self):
+        permanent_status_effect = StatusEffect(perk_id="permanent_status_effect", tags="status_effect, evasion",
+                                               name="Status Effect", desc="Test status effect.", effects="evasion, 1",
+                                               duration=-1)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.perk_inventory, perk_to_add=permanent_status_effect)
+        self.assertEqual(-1, self.perk_inventory.perks[-1].duration)
+        self.assertEqual(3, len(self.perk_inventory.perks))
+        PerkInventoryStatusEffectDurationLowerer.lower_status_effects_duration(perk_inv=self.perk_inventory)
+        PerkInventoryExpiredStatusEffectRemover.remove_expired_status_effects(perk_inv=self.perk_inventory)
+        self.assertEqual(2, len(self.perk_inventory.perks))
+
+    def test_incorrect_obj_as_perk_inventory_raises_exception(self):
+        with self.assertRaisesRegex(PerkInventory.PerkInventoryError, "incorrect object type for perk inventory"):
+            PerkInventoryExpiredStatusEffectRemover.remove_expired_status_effects(perk_inv="not PerkInventory object")
 
 
 if __name__ == "__main__":
