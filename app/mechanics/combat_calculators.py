@@ -428,7 +428,9 @@ class EffectiveAccuracyCalculator:
         character_accuracy = AccuracyCalculator.get_weapon_accuracy(character=character, opponent=opponent)
         opponent_evasion = CharacterDerivedStatCalculator.get_evasion(character=opponent)
         effective_accuracy = character_accuracy - opponent_evasion
-        return effective_accuracy if effective_accuracy > 1 else 1
+        if effective_accuracy < 1:
+            effective_accuracy = 1
+        return effective_accuracy
 
 
 class DamageResistanceCalculator:
@@ -531,6 +533,43 @@ class DamageResistanceCalculator:
             if len(effect) > 0 and set(effect) <= set(tags):
                 bonus_dmg_res += effect_value
         return bonus_dmg_res
+
+
+class EffectiveDamageCalculator:
+    """This class calculates effective damage a character does against a specific opponents (by taking into account all
+    bonuses / maluses provided by equipment and perks for both parties).
+
+    The class uses CombatCalculatorError exception, which is raised when specified characters are incorrect.
+    """
+
+    @staticmethod
+    def get_effective_damage(character, opponent, damage_roll):
+        """Calculates effective damage provided character does against specified opponent by calculating character's
+        damage against opponent's damage resistance modified by weapon's penetration potential."
+
+        :param character: Character derived object to calculate effective damage for
+        :param opponent: Character derived object to calculate effective damage resistance for
+        :param damage_roll: roll part of character's weapon damage formula
+        :raises CombatCalculatorError: when specified characters are incorrect
+        :return: character's effective damage against specified opponent
+        """
+        if not isinstance(character, Character):
+            raise CombatCalculatorError("incorrect object type for character")
+        if not isinstance(opponent, Character):
+            raise CombatCalculatorError("incorrect object type for opponent")
+        if character is opponent:
+            raise CombatCalculatorError("character and opponent are the same object")
+        weapon_damage_formula = DamageCalculator.get_weapon_damage(character=character, opponent=opponent)
+        effective_weapon_damage = DamageFormulaConverter.get_damage_tuple(weapon_damage_formula)
+        effective_weapon_damage = effective_weapon_damage[0] + damage_roll
+        effective_dmg_res = DamageResistanceCalculator.get_damage_resistance(character=opponent, opponent=character)
+        effective_dmg_res -= character.inventory.equipped_weapon.armor_pen
+        if effective_dmg_res < 0:
+            effective_dmg_res = 0
+        effective_damage = effective_weapon_damage - effective_dmg_res
+        if effective_damage < 0:
+            effective_damage = 0
+        return effective_damage
 
 
 class APCostCalculator:
