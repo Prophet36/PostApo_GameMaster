@@ -4,7 +4,7 @@ from app.characters.characters import Human, Critter
 from app.items.items import Armor
 from app.items.weapons import RangedWeapon, MeleeWeapon
 from app.mechanics.combat_calculators import CombatCalculatorError, DamageCalculator, DamageFormulaConverter
-from app.mechanics.combat_calculators import AccuracyCalculator, DamageResistanceCalculator
+from app.mechanics.combat_calculators import AccuracyCalculator, DamageResistanceCalculator, APCostCalculator
 from app.mechanics.inventory import InventoryItemAdder, InventoryItemEquipper, InventoryItemUnequipper
 from app.mechanics.perk_inventory import PerkInventoryPerkAdder
 from app.perks.perks import CharacterPerk
@@ -312,6 +312,50 @@ class TestDamageResistanceCalculator(unittest.TestCase):
         with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for opponent"):
             DamageResistanceCalculator.get_damage_resistance(character=self.character,
                                                              opponent="not Character derived object")
+
+
+class TestAPCostCalculator(unittest.TestCase):
+
+    def setUp(self):
+        self.character = Human(name="Human", tags="character", level=1, strength=5, endurance=5, agility=5,
+                               perception=5, intelligence=5)
+        self.critter = Critter(name="Critter", tags="critter, dog", level=1, strength=5, endurance=5, agility=5,
+                               perception=5, intelligence=5, health_bonus=10, exp_award=10)
+        weapon = RangedWeapon(item_id="gun", tags="weapon, gun, short", name="Gun", desc="Test gun.", damage="2 + 4d6",
+                              ammo_type="ammo", clip_size=10, armor_pen=0, accuracy=0, ap_cost=10, st_requirement=1,
+                              value=10, weight=2.0)
+        InventoryItemAdder.add_item(inv=self.character.inventory, item_to_add=weapon)
+        InventoryItemEquipper.equip_item(inv=self.character.inventory, item_to_equip=self.character.inventory.items[0])
+
+    def test_base_ap_cost(self):
+        ap_cost = APCostCalculator.get_ap_cost(character=self.character)
+        self.assertEqual(10, ap_cost)
+
+    def test_ap_cost_with_weapon_type_ap_cost_bonus_perks(self):
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
+                             effects="weapon, short, ap_cost, -2", requirements="agility, 5")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=perk)
+        ap_cost = APCostCalculator.get_ap_cost(character=self.character)
+        self.assertEqual(8, ap_cost)
+
+    def test_ap_cost_with_perks_without_qualifying_bonuses_gives_no_bonus_ap_cost(self):
+        perk = CharacterPerk(perk_id="perk", tags="perk, ap_cost", name="Perk", desc="Test perk.",
+                             effects="weapon, long, ap_cost, -2", requirements="agility, 5")
+        another_perk = CharacterPerk(perk_id="another_perk", tags="perk, damage", name="Perk", desc="Test perk.",
+                                     effects="weapon, short, damage, 2", requirements="agility, 5")
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=perk)
+        PerkInventoryPerkAdder.add_perk(perk_inv=self.character.perks, perk_to_add=another_perk)
+        ap_cost = APCostCalculator.get_ap_cost(character=self.character)
+        self.assertEqual(10, ap_cost)
+
+    def test_no_weapon_equipped_raises_exception(self):
+        InventoryItemUnequipper.unequip_weapon(inv=self.character.inventory)
+        with self.assertRaisesRegex(CombatCalculatorError, "no weapon equipped on character: .*"):
+            APCostCalculator.get_ap_cost(character=self.character)
+
+    def test_incorrect_obj_as_character_raises_exception(self):
+        with self.assertRaisesRegex(CombatCalculatorError, "incorrect object type for character"):
+            APCostCalculator.get_ap_cost(character="not Character derived object")
 
 
 if __name__ == "__main__":

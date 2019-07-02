@@ -495,3 +495,78 @@ class DamageResistanceCalculator:
             if len(effect) > 0 and set(effect) <= set(tags):
                 bonus_dmg_res += effect_value
         return bonus_dmg_res
+
+
+class APCostCalculator:
+    """This class calculates effective action points cost (base weapon action points cost and modified by perks) for
+    attacking with character's equipped weapon.
+
+    The class uses CombatCalculatorError exception, which is raised when specified character, or their weapons or perks
+    are incorrect.
+    """
+
+    @staticmethod
+    def get_ap_cost(character):
+        """Calculates effective attack action points cost based on equipped weapon and active perks.
+
+        :param character: Character derived object to calculate action points cost for
+        :raises CombatCalculatorError: when specified character, or their equipped weapons are incorrect
+        :return: effective attack action points cost
+        """
+        if not isinstance(character, Character):
+            raise CombatCalculatorError("incorrect object type for character")
+        if character.inventory.equipped_weapon is None:
+            raise CombatCalculatorError("no weapon equipped on character: {}".format(character.name))
+        effective_ap_cost = APCostCalculator._get_base_weapon_ap_cost(character=character)
+        effective_ap_cost += APCostCalculator._get_weapon_type_perk_ap_cost_bonus(character=character)
+        return effective_ap_cost
+
+    @staticmethod
+    def _get_base_weapon_ap_cost(character):
+        """Gets equipped weapon's base action points cost unmodified by any perks.
+
+        :param character: Character derived object to get weapon's base action points cost from
+        :return: equipped weapon's base action points cost
+        """
+        base_ap_cost = character.inventory.equipped_weapon.ap_cost
+        return base_ap_cost
+
+    @staticmethod
+    def _get_weapon_type_perk_ap_cost_bonus(character):
+        """Calculates bonus action points cost provided by perks based on type of equipped weapon.
+
+        :param character: Character derived object to calculate bonus action points cost for
+        :return: bonus action points cost based on weapon type
+        """
+        bonus_ap_cost = 0
+        weapon_tags = character.inventory.equipped_weapon.tags
+        for perk in character.perks.perks:
+            if not isinstance(perk, Perk):
+                raise CombatCalculatorError("incorrect object type for perk")
+            if "ap_cost" in perk.tags:
+                bonus_ap_cost += APCostCalculator._get_perk_ap_cost_bonus(perk=perk, tags=weapon_tags)
+        return bonus_ap_cost
+
+    @staticmethod
+    def _get_perk_ap_cost_bonus(perk, tags):
+        """Gets bonus action points cost gained by provided perk based on matching weapon tags.
+
+        Bonus is provided when set of tags from perk's effects are a subset of provided tags (weapon tags).
+
+        :param perk: Perk derived object to get bonus damage from
+        :param tags: tags to compare set of tags from perk effects to
+        :return: bonus action points cost based on perks with qualifying effects
+        """
+        bonus_ap_cost = 0
+        tags = tags.split(", ")
+        effects = perk.get_effects_list()
+        for effect in effects:
+            if "ap_cost" not in effect:
+                continue
+            effect = effect.split(", ")
+            effect.remove("ap_cost")
+            effect_value = int(effect[-1])
+            effect.pop(-1)
+            if len(effect) > 0 and set(effect) <= set(tags):
+                bonus_ap_cost += effect_value
+        return bonus_ap_cost
