@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from app.config.game_config import get_health_bonus_human, get_health_bonus_player
+import app.config.game_config as game_config
+
 from app.mechanics.inventory import Inventory
 from app.mechanics.perk_inventory import PerkInventory
 
@@ -184,7 +185,7 @@ class Human(Character):
         self._mechanics = 1
         self._survival = 1
         self._medicine = 1
-        self._health_bonus = get_health_bonus_human()
+        self._health_bonus = game_config.get_health_bonus_human()
 
     def __str__(self):
         return ("name: {}, tags: {}, level: {},\nstrength: {}, endurance: {}, agility: {}, perception: {}, "
@@ -342,7 +343,7 @@ class Player(Human):
         :param experience: player's experience points
         """
         super().__init__(name, tags, level, strength, endurance, agility, perception, intelligence)
-        self._health_bonus = get_health_bonus_player()
+        self._health_bonus = game_config.get_health_bonus_player()
         self._experience = experience
 
     def __str__(self):

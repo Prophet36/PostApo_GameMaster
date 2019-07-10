@@ -1,8 +1,9 @@
+import app.config.game_config as game_config
+
 from app.items.items import Item, Armor
 from app.items.factory import ItemFactory
 from app.items.stackables import Stackable, Ammo
 from app.items.weapons import Weapon, RangedWeapon
-from app.config.game_config import get_default_armor, get_default_weapon
 
 
 class Inventory:
@@ -279,7 +280,7 @@ class InventoryItemUnequipper:
         """
         if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("incorrect object type for inventory")
-        if inv.equipped_armor is None or inv.equipped_armor.item_id == get_default_armor():
+        if inv.equipped_armor is None or inv.equipped_armor.item_id == game_config.get_default_armor():
             raise Inventory.InventoryError("can't unequip default armor")
         inv.items.append(inv.equipped_armor)
         inv.equipped_armor = None
@@ -295,7 +296,7 @@ class InventoryItemUnequipper:
         """
         if not isinstance(inv, Inventory):
             raise Inventory.InventoryError("incorrect object type for inventory")
-        if inv.equipped_weapon is None or inv.equipped_weapon.item_id == get_default_weapon():
+        if inv.equipped_weapon is None or inv.equipped_weapon.item_id == game_config.get_default_weapon():
             raise Inventory.InventoryError("can't unequip default weapon")
         inv.items.append(inv.equipped_weapon)
         inv.equipped_weapon = None
@@ -447,7 +448,7 @@ class InventoryItemMover:
 
     @staticmethod
     def move_item(inv_to_move_to, inv_to_move_from, item_to_move):
-        """Moves specified weapon between specified inventories.
+        """Moves specified item between specified inventories.
 
         Specified inventories must be instances of Inventory class, and item must be in inventory from which it is
         moved from.
@@ -460,14 +461,14 @@ class InventoryItemMover:
         """
         if not (isinstance(inv_to_move_to, Inventory) and isinstance(inv_to_move_from, Inventory)):
             raise Inventory.InventoryError("incorrect object type for inventory")
-        if inv_to_move_to == inv_to_move_from:
+        if inv_to_move_to is inv_to_move_from:
             raise Inventory.InventoryError("both inventories reference the same object")
         if item_to_move in inv_to_move_from.items:
             InventoryItemMover._move_item(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from,
                                           item_to_move=item_to_move)
-        elif item_to_move == inv_to_move_from.equipped_armor:
+        elif item_to_move is inv_to_move_from.equipped_armor:
             InventoryItemMover._move_equipped_armor(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from)
-        elif item_to_move == inv_to_move_from.equipped_weapon:
+        elif item_to_move is inv_to_move_from.equipped_weapon:
             InventoryItemMover._move_equipped_weapon(inv_to_move_to=inv_to_move_to, inv_to_move_from=inv_to_move_from)
         else:
             raise Inventory.InventoryError("no such item in inventory")
